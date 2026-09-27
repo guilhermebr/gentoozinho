@@ -26,3 +26,14 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
     bash -n "$f"
   done
 }
+
+@test "packages step resolves before it merges and never uses autounmask" {
+  f="$REPO/install/packages/10-emerge.sh"
+  grep -q 'emerge --pretend' "$f"
+  grep -q 'emerge --getbinpkg --keep-going=n' "$f"
+  ! grep -q 'autounmask' "$f"
+}
+
+@test "finish step never reboots without a tty" {
+  grep -q '\[\[ -t 0 \]\]' "$REPO/install/finish/10-summary.sh"
+}
