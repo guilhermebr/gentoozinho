@@ -5,3 +5,5 @@ GZ_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${GZ_LIB}/log.sh"
 # shellcheck source=install/lib/fs.sh
 source "${GZ_LIB}/fs.sh"
+# shellcheck source=install/lib/portage.sh
+source "${GZ_LIB}/portage.sh"
