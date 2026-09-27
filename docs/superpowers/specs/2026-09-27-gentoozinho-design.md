@@ -30,7 +30,12 @@ Verified 2026-09-27.
 - The Gentoo cloud-init image (`current-di-amd64-cloudinit`) is built by catalyst
   from profile `default/linux/amd64/23.0/no-multilib/systemd`. It is systemd
   already. It is no-multilib, and Gentoo does not support switching a
-  no-multilib install to multilib.
+  no-multilib install to multilib. Booted and inspected 2026-09-27: it ships
+  no ebuild tree, no git, no eselect-repository, gcc 15.3.0,
+  `sys-kernel/gentoo-kernel` 6.18.50 with grub on a vfat `/boot`, a
+  preconfigured `[gentoo]` binhost in `binrepos.conf`, and a `gentoo` user
+  with passwordless sudo. It is EFI-only and does not boot under SeaBIOS, so
+  govm needs OVMF for it.
 - Hyprland is **not** in the `::gentoo` tree. `gui-wm/` there holds dwl,
   gamescope, labwc, sway, tinywl, wayfire. The Hypr ecosystem lives in
   `hyproverlay` (Codeberg, listed in Gentoo's overlay registry, active):
@@ -70,7 +75,7 @@ gentoozinho/
   metadata/layout.conf            masters = gentoo; repo-name = gentoozinho; thin-manifests
   profiles/repo_name              gentoozinho
   profiles/categories             gentoozinho-meta (plus any category we add ebuilds to)
-  profiles/gentoozinho/            custom profiles (section 5)
+  profiles/{base,vm,desktop}/     custom profiles (section 5)
   gentoozinho-meta/base/           meta ebuilds (section 6)
   gentoozinho-meta/desktop/
   gentoozinho-meta/dev/
@@ -102,24 +107,25 @@ target. This is how the VM (no-multilib) and metal (multilib) split is handled
 without branching in scripts.
 
 ```
-profiles/gentoozinho/base/
+profiles/base/
   eapi                 5 (profile EAPI; matches what current ::gentoo profiles use)
-  make.defaults        USE="wayland pipewire vulkan bluetooth networkmanager -X ..."; other shared defaults
-  package.use          per-package USE for the Hypr stack, sddm, pipewire, chromium, etc.
+  make.defaults        USE="wayland pipewire vulkan bluetooth networkmanager dist-kernel"
+  package.use          per-package USE for the Hypr stack, pipewire, portals, etc.
   package.use.force / package.use.mask   only if a package needs it
-profiles/gentoozinho/vm/
+profiles/vm/
   parent               gentoo:default/linux/amd64/23.0/no-multilib/systemd
-                       ..base
-profiles/gentoozinho/desktop/
+                       ../base
+profiles/desktop/
   parent               gentoo:default/linux/amd64/23.0/desktop/systemd
-                       ..base
+                       ../base
 profiles/profiles.desc
-  amd64  gentoozinho/vm       exp
-  amd64  gentoozinho/desktop  exp
+  amd64  vm       exp
+  amd64  desktop  exp
 ```
 
-Selected with `eselect profile set gentoozinho:gentoozinho/vm` or
-`gentoozinho:gentoozinho/desktop`. The installer chooses `vm` when the current
+Selected with `eselect profile set gentoozinho:vm` or `gentoozinho:desktop`
+(`layout.conf` sets `profile-formats = portage-2`, which allows the
+`repo:path` parent syntax). The installer chooses `vm` when the current
 profile path contains `no-multilib`, otherwise `desktop`, and accepts
 `--profile vm|desktop` to override.
 
@@ -157,8 +163,9 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
   net-wireless/bluez, gnome-base/nautilus, gui-apps/wl-clipboard,
   gui-apps/grim, gui-apps/slurp, app-misc/brightnessctl (guru), media-sound/pamixer (guru),
   media-fonts/noto, media-fonts/noto-emoji, media-fonts/noto-cjk,
-  media-fonts/jetbrains-mono, media-fonts/symbols-nerd-font, sys-kernel/gentoo-kernel-bin,
-  sys-kernel/installkernel, gentoozinho-meta/base.
+  media-fonts/jetbrains-mono, media-fonts/symbols-nerd-font, virtual/dist-kernel
+  (satisfied by the cloud image's gentoo-kernel or by gentoo-kernel-bin on
+  metal), sys-kernel/installkernel, gentoozinho-meta/base.
 - **dev**: app-containers/docker, app-containers/docker-compose,
   app-containers/docker-buildx, dev-util/mise (ours), app-containers/lazydocker
   (ours), gentoozinho-meta/base.
@@ -166,8 +173,9 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
   app-office/libreoffice-bin, media-video/mpv, media-gfx/imv,
   app-text/evince, net-misc/localsend (ours).
 
-Exact atoms are confirmed against the tree during planning; the lists above are
-the intent. Anything not found gets dropped from v1 rather than blocking it.
+Exact atoms were confirmed against the tree during planning. Phase 1 ships
+the metas without the ebuilds we have to write ourselves (gum, the payload
+package, mise, lazydocker, localsend); those join in phase 2.
 
 ## 7. Payload package and configuration model
 
@@ -229,7 +237,8 @@ in order, mirroring Omarchy:
 1. **preflight**: systemd is PID 1, amd64, root, `emerge` present, network up,
    detect profile family and virtualization (`systemd-detect-virt`), refuse to
    run on OpenRC.
-2. **portage**: `emerge --sync` if the tree is older than a day, install
+2. **portage**: `emerge-webrsync` when no tree exists (the cloud image ships
+   none), `emerge --sync` if the tree is older than a day, install
    `app-eselect/eselect-repository` and `dev-vcs/git`, enable `guru` and
    `hyproverlay`, add `gentoozinho` (from `--repo-url` or the default), write
    the `/etc/portage` files from section 5, set the profile.
