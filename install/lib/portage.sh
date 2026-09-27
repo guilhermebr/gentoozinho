@@ -58,6 +58,10 @@ gz_write_portage_config() {
 */*::hyproverlay ~amd64
 */*::gentoozinho ~amd64
 */*::guru ~amd64
+# Packages in ::gentoo that are still ~amd64 but the desktop needs.
+gui-apps/uwsm ~amd64
+dev-cpp/sdbus-c++ ~amd64
+app-shells/zoxide ~amd64
 EOF_KW
 
   gz_write_file "$etc/package.license/gentoozinho" <<'EOF_LIC'

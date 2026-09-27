@@ -13,9 +13,11 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   done
 }
 
-@test "vm inherits the no-multilib systemd profile and base" {
-  [ "$(sed -n 1p "$REPO/profiles/vm/parent")" = 'gentoo:default/linux/amd64/23.0/no-multilib/systemd' ]
-  [ "$(sed -n 2p "$REPO/profiles/vm/parent")" = '../base' ]
+@test "vm mirrors gentoo's desktop/systemd chain on a no-multilib base" {
+  [ "$(sed -n 1p "$REPO/profiles/vm/parent")" = 'gentoo:default/linux/amd64/23.0/no-multilib' ]
+  [ "$(sed -n 2p "$REPO/profiles/vm/parent")" = 'gentoo:targets/desktop' ]
+  [ "$(sed -n 3p "$REPO/profiles/vm/parent")" = 'gentoo:targets/systemd' ]
+  [ "$(sed -n 4p "$REPO/profiles/vm/parent")" = '../base' ]
 }
 
 @test "desktop inherits the desktop systemd profile and base" {
