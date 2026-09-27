@@ -1,11 +1,11 @@
-# gentoozito design
+# gentoozinho design
 
 Date: 2026-09-27
 Status: approved design, pre-plan
 
 ## 1. Purpose
 
-gentoozito turns a stock systemd Gentoo into an opinionated Hyprland desktop, the
+gentoozinho turns a stock systemd Gentoo into an opinionated Hyprland desktop, the
 way Omarchy does for Arch. It is built the Gentoo way: a real ebuild repository
 with custom profiles and meta-packages, plus a thin bootstrap script. It doubles
 as the author's path to Gentoo expertise: every phase produces working code and
@@ -16,7 +16,7 @@ Two targets must work from the same repo:
 - **VM**: the official Gentoo weekly cloud-init image booted by
   [govm](https://github.com/guilhermebr/govm). Used for iteration and tests.
 - **Metal**: a new physical machine (laptop or desktop, GPU not yet known),
-  installed from a stage3 and then finished by gentoozito.
+  installed from a stage3 and then finished by gentoozinho.
 
 Success for v1: on a fresh govm Gentoo VM, one command installs the desktop
 stack, enables the services, seeds a user, and the VM boots into SDDM and then
@@ -66,20 +66,20 @@ Verified 2026-09-27.
 ## 4. Repository layout
 
 ```
-gentoozito/
-  metadata/layout.conf            masters = gentoo; repo-name = gentoozito; thin-manifests
-  profiles/repo_name              gentoozito
-  profiles/categories             gentoozito-meta (plus any category we add ebuilds to)
-  profiles/gentoozito/            custom profiles (section 5)
-  gentoozito-meta/base/           meta ebuilds (section 6)
-  gentoozito-meta/desktop/
-  gentoozito-meta/dev/
-  gentoozito-meta/apps/
-  app-misc/gentoozito/            live ebuild installing the payload (section 7)
+gentoozinho/
+  metadata/layout.conf            masters = gentoo; repo-name = gentoozinho; thin-manifests
+  profiles/repo_name              gentoozinho
+  profiles/categories             gentoozinho-meta (plus any category we add ebuilds to)
+  profiles/gentoozinho/            custom profiles (section 5)
+  gentoozinho-meta/base/           meta ebuilds (section 6)
+  gentoozinho-meta/desktop/
+  gentoozinho-meta/dev/
+  gentoozinho-meta/apps/
+  app-misc/gentoozinho/            live ebuild installing the payload (section 7)
   <cat>/<pkg>/                    ebuilds for tools nobody packages (mise, lazydocker, localsend, gum)
   install.sh                      bootstrap entry point (section 8)
   install/                        step scripts grouped by stage
-  bin/                            gentoozito-* helper scripts (payload)
+  bin/                            gentoozinho-* helper scripts (payload)
   default/                        shared defaults sourced by user configs (payload)
   config/                         per-user config templates copied on first install (payload)
   themes/<name>/                  theme directories (payload)
@@ -102,52 +102,52 @@ target. This is how the VM (no-multilib) and metal (multilib) split is handled
 without branching in scripts.
 
 ```
-profiles/gentoozito/base/
+profiles/gentoozinho/base/
   eapi                 5 (profile EAPI; matches what current ::gentoo profiles use)
   make.defaults        USE="wayland pipewire vulkan bluetooth networkmanager -X ..."; other shared defaults
   package.use          per-package USE for the Hypr stack, sddm, pipewire, chromium, etc.
   package.use.force / package.use.mask   only if a package needs it
-profiles/gentoozito/vm/
+profiles/gentoozinho/vm/
   parent               gentoo:default/linux/amd64/23.0/no-multilib/systemd
                        ..base
-profiles/gentoozito/desktop/
+profiles/gentoozinho/desktop/
   parent               gentoo:default/linux/amd64/23.0/desktop/systemd
                        ..base
 profiles/profiles.desc
-  amd64  gentoozito/vm       exp
-  amd64  gentoozito/desktop  exp
+  amd64  gentoozinho/vm       exp
+  amd64  gentoozinho/desktop  exp
 ```
 
-Selected with `eselect profile set gentoozito:gentoozito/vm` or
-`gentoozito:gentoozito/desktop`. The installer chooses `vm` when the current
+Selected with `eselect profile set gentoozinho:gentoozinho/vm` or
+`gentoozinho:gentoozinho/desktop`. The installer chooses `vm` when the current
 profile path contains `no-multilib`, otherwise `desktop`, and accepts
 `--profile vm|desktop` to override.
 
 Things profiles cannot or should not carry are written by the installer into
-`/etc/portage/` (all named `gentoozito` so they are easy to find and remove):
+`/etc/portage/` (all named `gentoozinho` so they are easy to find and remove):
 
-- `package.accept_keywords/gentoozito`: `*/*::hyproverlay ~amd64`,
-  `*/*::gentoozito ~amd64`, plus the specific GURU packages we use.
-- `package.license/gentoozito`: licenses needed by the apps meta (fonts,
+- `package.accept_keywords/gentoozinho`: `*/*::hyproverlay ~amd64`,
+  `*/*::gentoozinho ~amd64`, plus the specific GURU packages we use.
+- `package.license/gentoozinho`: licenses needed by the apps meta (fonts,
   chromium codecs, and so on), never `*`.
-- `binrepos.conf/gentoozito.conf`: the official binhost for the matching
+- `binrepos.conf/gentoozinho.conf`: the official binhost for the matching
   profile, with signature verification on.
-- `make.conf`: a `source /etc/portage/gentoozito.conf` line added once, and
-  `/etc/portage/gentoozito.conf` holding `FEATURES="getbinpkg binpkg-request-signature"`,
+- `make.conf`: a `source /etc/portage/gentoozinho.conf` line added once, and
+  `/etc/portage/gentoozinho.conf` holding `FEATURES="getbinpkg binpkg-request-signature"`,
   `EMERGE_DEFAULT_OPTS="--binpkg-respect-use=y --jobs --load-average"`,
   `MAKEOPTS` derived from `nproc`, `ACCEPT_LICENSE="@FREE"` as the baseline.
 - `repos.conf/`: managed by `eselect repository`, not written by hand.
 
 ## 6. Meta-packages
 
-Four ebuilds in `gentoozito-meta/`, EAPI 8, no sources, only `RDEPEND`.
+Four ebuilds in `gentoozinho-meta/`, EAPI 8, no sources, only `RDEPEND`.
 Version `0` with revision bumps as the list changes. USE flags on a meta are
 allowed only to make a group optional (for example `nvidia`, `docker`).
 
 - **base**: app-shells/starship, sys-apps/eza, sys-apps/bat, sys-apps/fd,
   sys-apps/ripgrep, app-shells/fzf, app-shells/zoxide, sys-process/btop,
   app-misc/tmux, app-editors/neovim, dev-vcs/git, dev-vcs/lazygit (guru),
-  app-misc/jq, app-misc/gum (ours), app-misc/fastfetch, app-misc/gentoozito.
+  app-misc/jq, app-misc/gum (ours), app-misc/fastfetch, app-misc/gentoozinho.
 - **desktop**: gui-wm/hyprland, gui-apps/hyprlock, gui-apps/hypridle,
   gui-apps/hyprpaper, gui-apps/hyprpicker, gui-apps/hyprshot,
   gui-libs/xdg-desktop-portal-hyprland, sys-apps/xdg-desktop-portal-gtk,
@@ -158,10 +158,10 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
   gui-apps/grim, gui-apps/slurp, app-misc/brightnessctl (guru), media-sound/pamixer (guru),
   media-fonts/noto, media-fonts/noto-emoji, media-fonts/noto-cjk,
   media-fonts/jetbrains-mono, media-fonts/symbols-nerd-font, sys-kernel/gentoo-kernel-bin,
-  sys-kernel/installkernel, gentoozito-meta/base.
+  sys-kernel/installkernel, gentoozinho-meta/base.
 - **dev**: app-containers/docker, app-containers/docker-compose,
   app-containers/docker-buildx, dev-util/mise (ours), app-containers/lazydocker
-  (ours), gentoozito-meta/base.
+  (ours), gentoozinho-meta/base.
 - **apps**: www-client/chromium (binary where the binhost offers it),
   app-office/libreoffice-bin, media-video/mpv, media-gfx/imv,
   app-text/evince, net-misc/localsend (ours).
@@ -171,30 +171,30 @@ the intent. Anything not found gets dropped from v1 rather than blocking it.
 
 ## 7. Payload package and configuration model
 
-`app-misc/gentoozito-9999.ebuild` uses `git-r3` with `EGIT_REPO_URI` pointing
+`app-misc/gentoozinho-9999.ebuild` uses `git-r3` with `EGIT_REPO_URI` pointing
 at this repo. It installs:
 
-- `bin/gentoozito-*` to `/usr/bin/`
-- `default/` and `themes/` to `/usr/share/gentoozito/`
-- `config/` to `/usr/share/gentoozito/config/` as templates only; nothing is
+- `bin/gentoozinho-*` to `/usr/bin/`
+- `default/` and `themes/` to `/usr/share/gentoozinho/`
+- `config/` to `/usr/share/gentoozinho/config/` as templates only; nothing is
   written into a home directory by the ebuild.
 
 A versioned ebuild is added once the first tag exists. Updating the desktop is
-`gentoozito-update`, which runs `emerge --sync`, `emerge -uDN @world`,
+`gentoozinho-update`, which runs `emerge --sync`, `emerge -uDN @world`,
 `emerge --depclean --ask`, and `dispatch-conf` reminders.
 
 User configuration follows Omarchy's split. On first install (or with
-`gentoozito-refresh-config`), files from `config/` are copied into
+`gentoozinho-refresh-config`), files from `config/` are copied into
 `~/.config/`. The user's `~/.config/hypr/hyprland.conf` looks like:
 
 ```
-source = /usr/share/gentoozito/default/hypr/*.conf
+source = /usr/share/gentoozinho/default/hypr/*.conf
 source = ~/.config/hypr/monitors.conf
 source = ~/.config/hypr/input.conf
 source = ~/.config/hypr/bindings.conf
 source = ~/.config/hypr/looknfeel.conf
 source = ~/.config/hypr/autostart.conf
-source = ~/.config/gentoozito/current/theme/hyprland.conf
+source = ~/.config/gentoozinho/current/theme/hyprland.conf
 ```
 
 Defaults improve with package updates; the user-owned files are never
@@ -202,8 +202,8 @@ overwritten by an update.
 
 Themes are directories under `themes/<name>/` containing per-application
 fragments (`hyprland.conf`, `hyprlock.conf`, `waybar.css`, `alacritty.toml`,
-`mako.ini`, `walker.css`, `neovim.lua`, `backgrounds/`). `gentoozito-theme-set
-<name>` repoints `~/.config/gentoozito/current/theme` and reloads hyprland,
+`mako.ini`, `walker.css`, `neovim.lua`, `backgrounds/`). `gentoozinho-theme-set
+<name>` repoints `~/.config/gentoozinho/current/theme` and reloads hyprland,
 waybar, mako. v1 ships tokyo-night, catppuccin, gruvbox, nord, ported from
 Omarchy's theme files where licensing allows (Omarchy is MIT).
 
@@ -215,7 +215,7 @@ screenshot, and lock helpers bound to keys. Everything else waits.
 
 `install.sh` is the single entry point. It runs as root on any Gentoo systemd
 system with network, is idempotent (re-running converges, never duplicates
-config lines), logs to `/var/log/gentoozito/install.log`, and stops on the
+config lines), logs to `/var/log/gentoozinho/install.log`, and stops on the
 first failed step with a pointer to the log.
 
 Flags: `--profile vm|desktop`, `--user <name>` (default: the invoking sudo user,
@@ -231,7 +231,7 @@ in order, mirroring Omarchy:
    run on OpenRC.
 2. **portage**: `emerge --sync` if the tree is older than a day, install
    `app-eselect/eselect-repository` and `dev-vcs/git`, enable `guru` and
-   `hyproverlay`, add `gentoozito` (from `--repo-url` or the default), write
+   `hyproverlay`, add `gentoozinho` (from `--repo-url` or the default), write
    the `/etc/portage` files from section 5, set the profile.
 3. **packages**: `emerge --getbinpkg --keep-going=n` the selected metas.
    Fails loudly if any atom is unresolvable; no silent skipping.
@@ -251,7 +251,7 @@ in order, mirroring Omarchy:
 
 Metal installs start from the Gentoo Handbook up to a booting stage3
 desktop/systemd system with a user and network. `docs/install-metal.md` is a
-checklist version of that path with gentoozito-specific choices called out
+checklist version of that path with gentoozinho-specific choices called out
 (profile, dist-kernel, systemd-boot). `install.sh` takes over from there.
 
 ## 9. Testing
@@ -275,7 +275,7 @@ checklist version of that path with gentoozito-specific choices called out
 1. **Skeleton and install**: overlay plumbing, profiles, four metas, installer
    stages 1 to 4 and 7, smoke test green in govm. Doc: portage, profiles,
    overlays, binhost.
-2. **Payload and theming**: `app-misc/gentoozito`, default configs, four
+2. **Payload and theming**: `app-misc/gentoozinho`, default configs, four
    themes, key bindings, waybar, installer stage 5, first visual boot. Doc:
    ebuild writing, git-r3, config ownership.
 3. **Metal**: `docs/install-metal.md`, hardware modules (stage 6), install on
@@ -291,9 +291,12 @@ framework, multiple desktop flavours.
 
 ## 12. Open items
 
-- Project name: "gentoozito" is under review (collision, Gentoo name policy,
-  and whether the Portuguese diminutive reads as intended). A rename before
-  phase 1 code lands is cheap; the overlay `repo_name` and the meta category
-  are the only places it is load-bearing.
+- Project name: decided as "gentoozinho" on 2026-09-27 (Brazilian diminutive
+  of Gentoo; research showed the name is unclaimed on GitHub, package
+  registries and domains). Gentoo's name policy arguably covers software that
+  extends Gentoo, so the README carries an "unofficial community project, not
+  endorsed by Gentoo" line and a courtesy note goes to trustees@gentoo.org.
+  The local checkout directory is still named `gentoozito`; renaming it is a
+  local `mv` whenever convenient.
 - Package atoms in section 6 were checked against a 2026-09-27 clone of
   `::gentoo` and `::guru`; USE flags are resolved during planning.
