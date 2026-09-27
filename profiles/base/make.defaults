@@ -1,0 +1,4 @@
+# Shared USE defaults for every gentoozinho profile. Per-package flags live in
+# package.use; anything the profile cannot carry is written to /etc/portage by
+# install.sh.
+USE="wayland pipewire vulkan bluetooth networkmanager dist-kernel"

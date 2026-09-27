@@ -1,0 +1,7 @@
+# Hyprland: systemd integration and the uwsm session wrapper; hyprpm needs a
+# compiler toolchain at runtime and is not used by gentoozinho.
+gui-wm/hyprland systemd uwsm -hyprpm
+# PipeWire replaces PulseAudio.
+media-video/pipewire sound-server
+# Portals on Wayland.
+sys-apps/xdg-desktop-portal-gtk wayland
