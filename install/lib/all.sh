@@ -7,3 +7,7 @@ source "${GZ_LIB}/log.sh"
 source "${GZ_LIB}/fs.sh"
 # shellcheck source=install/lib/portage.sh
 source "${GZ_LIB}/portage.sh"
+# shellcheck source=install/lib/checks.sh
+source "${GZ_LIB}/checks.sh"
+# shellcheck source=install/lib/args.sh
+source "${GZ_LIB}/args.sh"
