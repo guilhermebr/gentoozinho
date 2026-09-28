@@ -41,7 +41,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 }
 
 @test "DESCRIPTION fits pkgcheck's 80 character limit" {
-  for f in "$REPO"/gentoozinho-meta/*/*.ebuild; do
+  for f in "$REPO"/gentoozinho-meta/*/*.ebuild "$REPO"/app-misc/*/*.ebuild; do
     d="$(sed -n 's/^DESCRIPTION="\([^"]*\)"/\1/p' "$f")"
     [ "${#d}" -le 80 ]
   done

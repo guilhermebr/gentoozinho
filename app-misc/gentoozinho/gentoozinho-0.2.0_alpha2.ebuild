@@ -4,7 +4,7 @@
 EAPI=8
 
 MY_PV="${PV/_alpha/-alpha}"
-DESCRIPTION="gentoozinho desktop payload: helper scripts, defaults, themes and config templates"
+DESCRIPTION="gentoozinho desktop payload: scripts, defaults, themes, config templates"
 HOMEPAGE="https://github.com/guilhermebr/gentoozinho"
 SRC_URI="https://github.com/guilhermebr/gentoozinho/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}/${PN}-${MY_PV}"

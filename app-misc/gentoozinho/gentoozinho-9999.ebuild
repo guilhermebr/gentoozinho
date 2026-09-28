@@ -5,7 +5,7 @@ EAPI=8
 
 inherit git-r3
 
-DESCRIPTION="gentoozinho desktop payload: helper scripts, defaults, themes and config templates"
+DESCRIPTION="gentoozinho desktop payload: scripts, defaults, themes, config templates"
 HOMEPAGE="https://github.com/guilhermebr/gentoozinho"
 EGIT_REPO_URI="https://github.com/guilhermebr/gentoozinho.git"
 
