@@ -72,7 +72,7 @@ vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATUR
 vm 'cat /tmp/shot.png' > test/artifacts/smoke.png
 [[ -s test/artifacts/smoke.png ]]
 vm 'test -f ~/.config/hypr/hyprland.lua && test ! -e ~/.config/hypr/hyprland.conf'
-vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); hyprctl -j binds | grep -q "gentoozinho-launch-terminal"'
+vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); hyprctl -j binds | grep -q "\"description\": \"Terminal\""'
 
 step "theme switching inside the session"
 vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); gentoozinho-theme-set catppuccin && test "$(gentoozinho-theme-current)" = catppuccin && hyprctl getoption general:col.active_border | grep -qi 89b4fa'

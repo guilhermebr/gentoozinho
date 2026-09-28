@@ -79,6 +79,10 @@ we did with it, what broke.
   `gentoozinho-refresh-config --init` moves a hyprlang home to
   `~/.config/hypr/pre-lua/` before seeding Lua; the installer's user stage
   runs it, so an upgrade migrates itself.
+- With Lua binds, `hyprctl -j binds` reports `"dispatcher": "__lua"` and an
+  index instead of the command; only `key` and `description` survive, which is
+  why every default bind carries a description and why
+  `gentoozinho-menu-keybindings` lists descriptions rather than commands.
 - The modules are real Lua, so `test/lua.sh` runs them on the host under a
   recording fake `hl` and checks binds, descriptions, commands, autostart and
   the theme hook in a second. Hyprland's `--verify-config` then confirms the
