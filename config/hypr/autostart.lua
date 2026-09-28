@@ -1,0 +1,2 @@
+-- Extra programs to start with the session (as systemd user scopes via uwsm).
+-- gz.launch_on_start("my-service")

@@ -9,6 +9,16 @@ src_root="$GENTOOZINHO_PATH/config"
 
 case "${1:-}" in
   --init)
+    # Phase 2 installs used hyprlang; Hyprland would keep loading the old
+    # hyprland.conf, so move the files that now have Lua counterparts aside.
+    hypr="$HOME/.config/hypr"
+    if [[ -f $hypr/hyprland.conf && ! -f $hypr/hyprland.lua ]]; then
+      mkdir -p "$hypr/pre-lua"
+      for f in hyprland monitors input bindings looknfeel autostart; do
+        [[ -f $hypr/$f.conf ]] && mv "$hypr/$f.conf" "$hypr/pre-lua/$f.conf"
+      done
+      echo "Moved your hyprlang Hyprland files to $hypr/pre-lua/ (Hyprland 0.57 drops .conf); Lua files seeded"
+    fi
     while IFS= read -r -d '' f; do
       rel="${f#"$src_root"/}"
       dst="$HOME/.config/$rel"

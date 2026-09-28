@@ -22,7 +22,7 @@ gz_sddm_conf() {
 DisplayServer=wayland
 
 [Wayland]
-CompositorCommand=Hyprland -c /usr/share/gentoozinho/default/sddm/hyprland.conf
+CompositorCommand=Hyprland -c /usr/share/gentoozinho/default/sddm/hyprland.lua
 EOF_SDDM
   if (( autologin )); then
     cat <<EOF_AUTO

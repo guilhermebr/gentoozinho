@@ -20,7 +20,7 @@ setup() {
 @test "gz_sddm_conf renders wayland greeter, session and optional autologin" {
   out="$(gz_sddm_conf alice 0)"
   [[ "$out" == *"DisplayServer=wayland"* ]]
-  [[ "$out" == *"CompositorCommand=Hyprland -c /usr/share/gentoozinho/default/sddm/hyprland.conf"* ]]
+  [[ "$out" == *"CompositorCommand=Hyprland -c /usr/share/gentoozinho/default/sddm/hyprland.lua"* ]]
   [[ "$out" != *"[Autologin]"* ]]
   # QT_WAYLAND_SHELL_INTEGRATION=layer-shell aborts sddm-greeter-qt6 when layer-shell-qt is absent
   [[ "$out" != *"layer-shell"* ]]

@@ -16,7 +16,8 @@ teardown() { rm -rf "$HOME"; }
 @test "theme-set renders every template with the theme's colors" {
   gentoozinho-theme-set tokyo-night
   t="$HOME/.config/gentoozinho/current/theme"
-  grep -q 'rgb(7aa2f7)' "$t/hyprland.conf"
+  grep -q 'rgb(7aa2f7)' "$t/hyprland.lua"
+  [ ! -e "$t/hyprland.conf" ]
   grep -q 'background-color=#1a1b26' "$t/mako.ini"
   grep -q 'include=/usr/share/gentoozinho/default/mako/core.ini' "$t/mako.ini"
   grep -q '@define-color background #1a1b26;' "$t/waybar.css"
@@ -66,19 +67,19 @@ teardown() { rm -rf "$HOME"; }
 
 @test "refresh-config --init seeds missing files only (review focus 2)" {
   mkdir -p "$HOME/.config/hypr"
-  printf 'mine\n' > "$HOME/.config/hypr/hyprland.conf"
+  printf 'mine\n' > "$HOME/.config/hypr/hyprland.lua"
   gentoozinho-refresh-config --init
-  [ "$(cat "$HOME/.config/hypr/hyprland.conf")" = mine ]
-  [ -f "$HOME/.config/hypr/monitors.conf" ]
+  [ "$(cat "$HOME/.config/hypr/hyprland.lua")" = mine ]
+  [ -f "$HOME/.config/hypr/monitors.lua" ]
   [ -f "$HOME/.config/waybar/config.jsonc" ]
 }
 
 @test "refresh-config PATH replaces one file and keeps a backup" {
   mkdir -p "$HOME/.config/hypr"
-  printf 'mine\n' > "$HOME/.config/hypr/hyprland.conf"
-  gentoozinho-refresh-config hypr/hyprland.conf
-  grep -q 'source = /usr/share/gentoozinho/default/hypr/autostart.conf' "$HOME/.config/hypr/hyprland.conf"
-  ls "$HOME"/.config/hypr/hyprland.conf.bak.* > /dev/null
+  printf 'mine\n' > "$HOME/.config/hypr/hyprland.lua"
+  gentoozinho-refresh-config hypr/hyprland.lua
+  grep -q 'require("default.hypr.gentoozinho")' "$HOME/.config/hypr/hyprland.lua"
+  ls "$HOME"/.config/hypr/hyprland.lua.bak.* > /dev/null
 }
 
 @test "every theme has colors.toml with the keys the templates use and exactly one background" {
@@ -104,4 +105,18 @@ teardown() { rm -rf "$HOME"; }
   run gentoozinho-theme-set bad
   [ "$status" -eq 1 ]
   [[ "$output" == *"key"* ]]
+}
+
+@test "refresh-config --init migrates a hyprlang home to Lua (review focus 1)" {
+  mkdir -p "$HOME/.config/hypr"
+  for f in hyprland monitors input bindings looknfeel autostart hyprlock hypridle; do printf 'old\n' > "$HOME/.config/hypr/$f.conf"; done
+  run gentoozinho-refresh-config --init
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"pre-lua"* ]]
+  [ -f "$HOME/.config/hypr/hyprland.lua" ]
+  [ ! -e "$HOME/.config/hypr/hyprland.conf" ]
+  [ -f "$HOME/.config/hypr/pre-lua/hyprland.conf" ]
+  [ -f "$HOME/.config/hypr/pre-lua/bindings.conf" ]
+  [ "$(cat "$HOME/.config/hypr/hyprlock.conf")" = old ]
+  [ "$(cat "$HOME/.config/hypr/hypridle.conf")" = old ]
 }

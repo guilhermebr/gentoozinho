@@ -112,10 +112,10 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 }
 
 @test "greeter compositor config has no gaps and fullscreens the greeter (review I10)" {
-  f="$REPO/default/sddm/hyprland.conf"
-  grep -qE '^\s*gaps_out = 0' "$f"
-  grep -qE '^\s*border_size = 0' "$f"
-  grep -q 'windowrule = fullscreen on, match:class' "$f"
+  f="$REPO/default/sddm/hyprland.lua"
+  grep -q 'gaps_out = 0' "$f"
+  grep -q 'border_size = 0' "$f"
+  grep -q 'fullscreen = true' "$f"
 }
 
 @test "smoke test also exercises the SDDM greeter without autologin (review I10)" {
