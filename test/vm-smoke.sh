@@ -50,7 +50,7 @@ vm 'systemctl is-active sddm'
 vm 'systemctl is-active NetworkManager'
 vm 'for _ in $(seq 1 30); do pgrep -x Hyprland > /dev/null && break; sleep 2; done; pgrep -x Hyprland'
 vm 'loginctl list-sessions --no-legend | grep -q "$(id -un)"'
-vm 'sleep 5; pgrep -x waybar && pgrep -x mako && pgrep -x hypridle && pgrep -x hyprpaper'
+vm 'sleep 5; pgrep -x waybar && pgrep -x mako && pgrep -x hypridle && pgrep -x swaybg'
 
 step "screenshot from inside the session"
 mkdir -p test/artifacts

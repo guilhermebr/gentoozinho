@@ -14,19 +14,10 @@ for i in "${!bgs[@]}"; do
 done
 ln -sfn "$next" "$CURRENT/background"
 
-# hyprpaper (0.8+) reads a wallpaper block; point it at the stable symlink and
-# restart hyprpaper when it is running so the change shows immediately.
-mkdir -p "$HOME/.config/hypr"
-cat > "$HOME/.config/hypr/hyprpaper.conf" <<EOF_HP
-splash = false
-
-wallpaper {
-    monitor =
-    path = $CURRENT/background
-    fit_mode = cover
-}
-EOF_HP
-if pgrep -x hyprpaper > /dev/null; then
-  pkill -x hyprpaper || true
-  setsid -f uwsm-app -- hyprpaper > /dev/null 2>&1 || setsid -f hyprpaper > /dev/null 2>&1 || true
+# swaybg shows the wallpaper (hyprpaper 0.8 needs a real GPU driver and
+# crashes on software rendering); restart it when it is running.
+if pgrep -x swaybg > /dev/null; then
+  pkill -x swaybg || true
+  setsid -f uwsm-app -- swaybg -i "$CURRENT/background" -m fill > /dev/null 2>&1 \
+    || setsid -f swaybg -i "$CURRENT/background" -m fill > /dev/null 2>&1 || true
 fi

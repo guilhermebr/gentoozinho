@@ -22,7 +22,10 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 
 @test "autostart launches the session services through uwsm-app" {
   f="$REPO/default/hypr/autostart.conf"
-  for app in hypridle mako waybar hyprpaper; do grep -q "exec-once = uwsm-app -- $app" "$f"; done
+  for app in hypridle mako waybar; do grep -q "exec-once = uwsm-app -- $app" "$f"; done
+  grep -q "exec-once = uwsm-app -- swaybg -i ~/.config/gentoozinho/current/background -m fill" "$f"
+  run grep -q hyprpaper "$f"
+  [ "$status" -ne 0 ]
   grep -q 'exec-once = systemctl --user import-environment' "$f"
 }
 

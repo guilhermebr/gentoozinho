@@ -18,11 +18,11 @@ RDEPEND="
 	gui-apps/grim
 	gui-apps/hypridle
 	gui-apps/hyprlock
-	gui-apps/hyprpaper
 	gui-apps/hyprpicker
 	gui-apps/hyprshot
 	gui-apps/mako
 	gui-apps/slurp
+	gui-apps/swaybg
 	gui-apps/swayosd
 	gui-apps/uwsm
 	gui-apps/walker

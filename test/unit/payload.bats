@@ -21,8 +21,11 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   bash -n "$f"
 }
 
-@test "desktop meta pulls the payload" {
+@test "desktop meta pulls the payload and the wallpaper tool is swaybg, not hyprpaper" {
   grep -qx $'\tapp-misc/gentoozinho' "$REPO/gentoozinho-meta/desktop/desktop-0.ebuild"
+  grep -qx $'\tgui-apps/swaybg' "$REPO/gentoozinho-meta/desktop/desktop-0.ebuild"
+  run grep -r hyprpaper "$REPO/gentoozinho-meta" "$REPO/app-misc"
+  [ "$status" -ne 0 ]
 }
 
 @test "session file starts Hyprland through uwsm" {

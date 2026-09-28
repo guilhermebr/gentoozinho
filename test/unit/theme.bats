@@ -27,10 +27,8 @@ teardown() { rm -rf "$HOME"; }
   grep -q 'background = "#1a1b26"' "$t/alacritty.toml"
   [ "$(cat "$HOME/.config/gentoozinho/current/theme.name")" = tokyo-night ]
   [ -L "$HOME/.config/gentoozinho/current/background" ]
-  grep -q "^    path = $HOME/.config/gentoozinho/current/background$" "$HOME/.config/hypr/hyprpaper.conf"
-  grep -q '^wallpaper {$' "$HOME/.config/hypr/hyprpaper.conf"
-  run grep -q '^preload' "$HOME/.config/hypr/hyprpaper.conf"
-  [ "$status" -ne 0 ]
+  [ ! -e "$HOME/.config/hypr/hyprpaper.conf" ]
+  grep -q 'swaybg' "$REPO/bin/gentoozinho-theme-bg-next"
 }
 
 @test "theme-set works with no compositor running (review focus 1)" {
