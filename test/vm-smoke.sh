@@ -1,20 +1,34 @@
 #!/usr/bin/env bash
 # End-to-end: fresh Gentoo VM -> install.sh -> assertions -> second run is a no-op.
-# Requires govm, KVM and a govm gentoo entry that boots (OVMF). Set GZ_KEEP_VM=1
-# to keep the VM after success. Set GZ_SMOKE_SSH="ssh -p PORT user@host" to run
-# against a VM you booted by hand instead of creating one with govm.
+# Requires limactl (Lima), QEMU/KVM and OVMF. The VM is the current official
+# Gentoo cloud-init build, booted in Lima plain mode with a virtio-vga display
+# served on VNC (see ~/.lima/$VM/vncdisplay). Set GZ_KEEP_VM=1 to keep the VM
+# after success. Set GZ_SMOKE_SSH="ssh -p PORT user@host" to run against a VM
+# you booted by hand instead of creating one with Lima.
 # shellcheck disable=SC2016  # single-quoted commands are expanded on the remote side on purpose
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VM="${GZ_SMOKE_VM:-gz-smoke}"
-export GOVM_CPUS="${GOVM_CPUS:-8}" GOVM_MEM_MB="${GOVM_MEM_MB:-8192}"
+GZ_SMOKE_CPUS="${GZ_SMOKE_CPUS:-8}" GZ_SMOKE_MEM="${GZ_SMOKE_MEM:-8}" GZ_SMOKE_DISK="${GZ_SMOKE_DISK:-30}"   # memory and disk in GiB
+GENTOO_CLOUD="https://distfiles.gentoo.org/releases/amd64/autobuilds/current-di-amd64-cloudinit/"
 
 if [[ -n "${GZ_SMOKE_SSH:-}" ]]; then
   vm() { ${GZ_SMOKE_SSH} -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "$@"; }
 else
-  govm status "$VM" > /dev/null 2>&1 || govm create gentoo "$VM"
-  vm() { govm ssh "$VM" -- "$@"; }
+  if ! limactl list -q | grep -qx "$VM"; then
+    # Gentoo publishes only dated filenames and prunes them after about a week,
+    # so resolve the current build from the signed pointer at create time.
+    img="$(curl -fsSL "${GENTOO_CLOUD}latest-di-amd64-cloudinit.txt" | awk '/\.qcow2/ {print $1; exit}')"
+    [[ -n "$img" ]] || { echo "could not resolve the current Gentoo cloud image" >&2; exit 1; }
+    limactl start --name "$VM" --plain --tty=false \
+      --cpus "$GZ_SMOKE_CPUS" --memory "$GZ_SMOKE_MEM" --disk "$GZ_SMOKE_DISK" \
+      --set '.video.display="vnc"' "${GENTOO_CLOUD}${img}"
+  else
+    limactl start --tty=false "$VM"
+  fi
+  # Plain ssh (not `limactl shell`) so single-quoted commands expand on the remote side, as before.
+  vm() { ssh -F "$HOME/.lima/$VM/ssh.config" "lima-$VM" "$@"; }
 fi
 
 step() { printf '\n### %s\n' "$*"; }
@@ -85,5 +99,5 @@ vm 'sudo emerge --noreplace --quiet dev-util/pkgcheck && pkgcheck scan -r gentoo
 echo
 echo "SMOKE OK"
 if [[ -z "${GZ_SMOKE_SSH:-}" && -z "${GZ_KEEP_VM:-}" ]]; then
-  yes | govm delete "$VM"
+  limactl delete --force "$VM"
 fi

@@ -67,9 +67,11 @@ had only a manual check.
     test/lint.sh        # shellcheck (docker)
     test/vm-smoke.sh    # full install, reboot into the session, screenshot (needs a VM)
 
-The smoke VM is booted by hand until govm boots the Gentoo image itself:
-see the plan's Task 7 for the QEMU command (OVMF, `-vga virtio`, VNC on
-127.0.0.1:5900) and set `GZ_SMOKE_SSH="ssh -p 40222 gentoo@127.0.0.1"`.
+The smoke VM is a [Lima](https://lima-vm.io) instance: `test/vm-smoke.sh`
+resolves the current official Gentoo cloud-init image, boots it in plain mode
+with a virtio-vga display on VNC (`~/.lima/gz-smoke/vncdisplay` and
+`vncpassword`), and drives it over ssh. Needs `limactl`, QEMU/KVM and OVMF.
+To reuse a VM you booted yourself, set `GZ_SMOKE_SSH="ssh -p PORT user@host"`.
 
 ## License
 
