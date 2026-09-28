@@ -158,7 +158,7 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
 - **base**: app-shells/starship, sys-apps/eza, sys-apps/bat, sys-apps/fd,
   sys-apps/ripgrep, app-shells/fzf, app-shells/zoxide, sys-process/btop,
   app-misc/tmux, app-editors/neovim, dev-vcs/git, dev-vcs/lazygit (guru),
-  app-misc/jq, app-misc/gum (ours), app-misc/fastfetch, app-misc/gentoozinho.
+  app-misc/jq, app-misc/gum (ours), app-misc/fastfetch.
 - **desktop**: gui-wm/hyprland, gui-apps/hyprlock, gui-apps/hypridle,
   gui-apps/hyprpaper, gui-apps/hyprpicker, gui-apps/hyprshot,
   gui-libs/xdg-desktop-portal-hyprland, sys-apps/xdg-desktop-portal-gtk,
@@ -170,7 +170,9 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
   media-fonts/noto, media-fonts/noto-emoji, media-fonts/noto-cjk,
   media-fonts/jetbrains-mono, media-fonts/symbols-nerd-font, virtual/dist-kernel
   (satisfied by the cloud image's gentoo-kernel or by gentoo-kernel-bin on
-  metal), sys-kernel/installkernel, gentoozinho-meta/base.
+  metal), sys-kernel/installkernel, gui-apps/swaybg, app-misc/gentoozinho
+  (the payload; its scripts need desktop tools, so it lives here, not in
+  base), gentoozinho-meta/base.
 - **dev**: app-containers/docker, app-containers/docker-compose,
   app-containers/docker-buildx, dev-util/mise (ours), app-containers/lazydocker
   (ours), gentoozinho-meta/base.
@@ -214,12 +216,14 @@ source = ~/.config/gentoozinho/current/theme/hyprland.conf
 Defaults improve with package updates; the user-owned files are never
 overwritten by an update.
 
-Themes are directories under `themes/<name>/` containing per-application
-fragments (`hyprland.conf`, `hyprlock.conf`, `waybar.css`, `alacritty.toml`,
-`mako.ini`, `walker.css`, `neovim.lua`, `backgrounds/`). `gentoozinho-theme-set
-<name>` repoints `~/.config/gentoozinho/current/theme` and reloads hyprland,
-waybar, mako. v1 ships tokyo-night, catppuccin, gruvbox, nord, ported from
-Omarchy's theme files where licensing allows (Omarchy is MIT).
+Themes are directories under `themes/<name>/` holding one `colors.toml`, one
+background image, and optional verbatim fragments (`btop.theme`, `neovim.lua`).
+`gentoozinho-theme-set <name>` renders `default/themed/*.tpl` (hyprland,
+hyprlock, waybar, alacritty, mako, walker, swayosd) from the colors into
+`~/.config/gentoozinho/current/theme`, swaps it in atomically, picks a
+background (shown by swaybg) and reloads whatever runs. v1 ships tokyo-night,
+catppuccin, gruvbox, nord, adapted from Omarchy v3.8.4 (MIT). hyprpaper was
+dropped: 0.8 crashes without a real GPU driver.
 
 Helper scripts in `bin/` are ported from Omarchy only when a v1 feature needs
 them: theme set/next, refresh-config, update, and the audio, brightness,
@@ -234,8 +238,10 @@ first failed step with a pointer to the log.
 
 Flags: `--profile vm|desktop`, `--user <name>` (default: the invoking sudo user,
 or `gentoo` on the cloud image), `--metas base,desktop,dev,apps` (default
-`base,desktop`), `--no-reboot`, `--repo-url <url>` (for testing a branch or a
-local clone).
+`base,desktop`), `--no-reboot`, `--autologin` (SDDM autologin into the
+gentoozinho session; off by default, used by the smoke test), `--repo-url
+<url>` (for testing a branch or a local clone; a local git checkout is also
+what the live payload ebuild is built from).
 
 Stages, each a directory under `install/` with an `all.sh` that runs its steps
 in order, mirroring Omarchy:
@@ -250,10 +256,12 @@ in order, mirroring Omarchy:
    the `/etc/portage` files from section 5, set the profile.
 3. **packages**: `emerge --getbinpkg --keep-going=n` the selected metas.
    Fails loudly if any atom is unresolvable; no silent skipping.
-4. **system**: `systemctl enable` NetworkManager, sddm, bluetooth,
-   systemd-resolved; mask NetworkManager-wait-online; PAM entry for hyprlock;
-   sddm autologin disabled by default; polkit and seat setup as needed by
-   uwsm.
+4. **system**: remove the cloud image's headless kernel config snippet and
+   install `gentoo-kernel-bin` when no installed kernel has DRM modules;
+   `systemctl enable` NetworkManager, sddm, bluetooth; mask
+   NetworkManager-wait-online; disable systemd-networkd; SDDM runs a Wayland
+   greeter with Hyprland as its compositor, default session gentoozinho,
+   autologin only with `--autologin`. Gentoo ships the hyprlock PAM file.
 5. **user**: create the user if missing (groups: wheel, video, audio, input,
    docker when dev meta chosen), copy `config/` templates, set the default
    theme, install the shell init snippet.
@@ -306,6 +314,9 @@ framework, multiple desktop flavours.
 
 ## 12. Open items
 
+- Hyprland 0.57 removes hyprlang `.conf` support (0.56 warns in-session).
+  The Lua config migration is a structural change to plan as its own phase
+  before 0.57 reaches hyproverlay.
 - Project name: decided as "gentoozinho" on 2026-09-27 (Brazilian diminutive
   of Gentoo; research showed the name is unclaimed on GitHub, package
   registries and domains). Gentoo's name policy arguably covers software that

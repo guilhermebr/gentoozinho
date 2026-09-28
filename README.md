@@ -10,16 +10,24 @@ the Gentoo Foundation, Inc. See <https://www.gentoo.org>.
 
 ## Status
 
-Phase 1 done: overlay, `vm` and `desktop` profiles, four meta-packages and the
-installer. Proven on the official Gentoo cloud-init image (amd64, systemd) in
-an 8 vCPU QEMU VM: 430 packages merged, 368 as binaries and 62 from source,
-in about 4.5 hours of wall time dominated by gcc 16 and the kernel rebuild.
-The second run is a no-op, `dev` and `apps` resolve, and `pkgcheck` is clean.
-No desktop configuration is installed yet; that is phase 2. Design:
+Phase 2 done: the VM boots into SDDM, logs into a themed Hyprland session
+with waybar, walker, mako, hyprlock, hypridle and swaybg, and the smoke test
+proves it with a screenshot taken inside the session. The payload
+(`app-misc/gentoozinho`) installs helper scripts, defaults, four themes
+(tokyo-night, catppuccin, gruvbox, nord) and user config templates;
+`gentoozinho-theme-set NAME` switches themes live. Phase 1 proved the overlay,
+profiles, meta-packages and installer on the official Gentoo cloud-init image
+(430 packages, 368 binary). Design:
 `docs/superpowers/specs/2026-09-27-gentoozinho-design.md`. Notes on what the
 work taught: `docs/learning/`.
 
-A 20 GB disk is tight for a VM that compiles; give it 25 GB or more.
+Known: Hyprland 0.56 warns that `.conf` config support ends in 0.57; the Lua
+migration is the next structural job. Real hardware (`desktop` profile) is
+still untested (phase 3). A 20 GB disk is tight for a VM that compiles; give it
+25 GB or more.
+
+Configs and themes are adapted from [Omarchy](https://omarchy.org) v3.8.4
+(MIT) by Basecamp.
 
 ## Install
 
@@ -30,7 +38,12 @@ On a systemd Gentoo (amd64) with network, as root:
     ./install.sh
 
 Flags: `--profile vm|desktop`, `--user NAME`, `--metas base,desktop,dev,apps`,
-`--no-reboot`, `--repo-url URL_OR_DIR`.
+`--no-reboot`, `--autologin`, `--repo-url URL_OR_DIR`.
+
+After a reboot, log in to the "gentoozinho (Hyprland, uwsm)" session. Useful
+commands: `gentoozinho-theme-list`, `gentoozinho-theme-set NAME`,
+`gentoozinho-theme-next`, `gentoozinho-refresh-config --init`,
+`gentoozinho-update`. Super+K lists the key bindings.
 
 What it does to your system: selects a gentoozinho profile (which inherits
 Gentoo's desktop target), writes a few files named `gentoozinho` under
@@ -46,7 +59,11 @@ the source kernel and rebuild it.
 
     test/unit.sh        # bats unit tests (docker)
     test/lint.sh        # shellcheck (docker)
-    test/vm-smoke.sh    # full install in a govm VM (needs govm, KVM, OVMF)
+    test/vm-smoke.sh    # full install, reboot into the session, screenshot (needs a VM)
+
+The smoke VM is booted by hand until govm boots the Gentoo image itself:
+see the plan's Task 7 for the QEMU command (OVMF, `-vga virtio`, VNC on
+127.0.0.1:5900) and set `GZ_SMOKE_SSH="ssh -p 40222 gentoo@127.0.0.1"`.
 
 ## License
 
