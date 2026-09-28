@@ -73,7 +73,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 }
 
 @test "repos step points git-r3 at a local checkout" {
-  grep -q 'EGIT_OVERRIDE_REPO_GENTOOZINHO' "$REPO/install/portage/30-repos.sh"
+  grep -q 'EGIT_OVERRIDE_REPO_GUILHERMEBR_GENTOOZINHO' "$REPO/install/portage/30-repos.sh"
 }
 
 @test "user stage seeds config, sets the theme and sources the shell rc as the user" {

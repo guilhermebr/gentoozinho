@@ -32,12 +32,13 @@ auto-sync = no
 CONF
     rsync -a --delete --exclude .git "${GZ_REPO_URL%/}/" "${GZ_ROOT}/var/db/repos/gentoozinho/"
     # app-misc/gentoozinho is a git live ebuild: make git-r3 clone this checkout
-    # (its committed HEAD) instead of GitHub.
+    # (its committed HEAD) instead of GitHub. git-r3 names the override after the
+    # repository URL (guilhermebr/gentoozinho.git), not after the package.
     if git -C "$GZ_REPO_URL" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-      export EGIT_OVERRIDE_REPO_GENTOOZINHO="file://${GZ_REPO_URL%/}"
-      EGIT_OVERRIDE_BRANCH_GENTOOZINHO="$(git -C "$GZ_REPO_URL" rev-parse --abbrev-ref HEAD)"
-      export EGIT_OVERRIDE_BRANCH_GENTOOZINHO
-      gz_log "git-r3 will clone app-misc/gentoozinho from ${EGIT_OVERRIDE_REPO_GENTOOZINHO} (${EGIT_OVERRIDE_BRANCH_GENTOOZINHO})"
+      export EGIT_OVERRIDE_REPO_GUILHERMEBR_GENTOOZINHO="file://${GZ_REPO_URL%/}"
+      EGIT_OVERRIDE_BRANCH_GUILHERMEBR_GENTOOZINHO="$(git -C "$GZ_REPO_URL" rev-parse --abbrev-ref HEAD)"
+      export EGIT_OVERRIDE_BRANCH_GUILHERMEBR_GENTOOZINHO
+      gz_log "git-r3 will clone app-misc/gentoozinho from ${EGIT_OVERRIDE_REPO_GUILHERMEBR_GENTOOZINHO} (${EGIT_OVERRIDE_BRANCH_GUILHERMEBR_GENTOOZINHO})"
     fi
     ;;
   git)
