@@ -87,3 +87,9 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'gz_kernel_has_drm' "$REPO/install/system/05-kernel.sh"
   grep -q 'sys-kernel/gentoo-kernel-bin' "$REPO/install/system/05-kernel.sh"
 }
+
+@test "packages step refreshes the live payload on re-runs (Portage never re-merges 9999 by itself)" {
+  f="$REPO/install/packages/10-emerge.sh"
+  grep -q 'app-misc/gentoozinho-9999' "$f"
+  grep -q 'emerge --oneshot' "$f"
+}

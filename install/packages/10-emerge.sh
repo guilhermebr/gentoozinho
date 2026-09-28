@@ -16,3 +16,10 @@ emerge --pretend --quiet --update --deep --newuse @world "${atoms[@]}" \
 
 gz_log "merging (binary packages where available)"
 emerge --getbinpkg --keep-going=n --verbose --update --deep --newuse @world "${atoms[@]}"
+
+# A git live ebuild is never re-merged by a world update, so a re-run of the
+# installer would keep a stale payload. Refresh it explicitly.
+if [[ -d "${GZ_ROOT}/var/db/pkg/app-misc/gentoozinho-9999" ]]; then
+  gz_log "refreshing the live payload (app-misc/gentoozinho-9999)"
+  emerge --oneshot --quiet app-misc/gentoozinho
+fi

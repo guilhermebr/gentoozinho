@@ -44,3 +44,12 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 @test "lint covers bin scripts" {
   grep -q "bin/gentoozinho-\*" "$REPO/test/lint.sh"
 }
+
+@test "a keyworded snapshot ebuild exists beside the live one so stable profiles can solve the desktop meta" {
+  f="$(ls "$REPO"/app-misc/gentoozinho/gentoozinho-0.*.ebuild | head -1)"
+  [ -n "$f" ]
+  grep -qx 'KEYWORDS="~amd64"' "$f"
+  grep -q 'SRC_URI="https://github.com/guilhermebr/gentoozinho/archive/refs/tags/' "$f"
+  grep -q 'insinto /usr/share/gentoozinho' "$f"
+  bash -n "$f"
+}
