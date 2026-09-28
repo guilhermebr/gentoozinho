@@ -34,3 +34,8 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q -- '--depclean' "$f"
   grep -q 'dispatch-conf' "$f"
 }
+
+@test "gentoozinho-update refreshes the live payload (review I5)" {
+  grep -q 'app-misc/gentoozinho-9999' "$REPO/bin/gentoozinho-update"
+  grep -q 'emerge --oneshot' "$REPO/bin/gentoozinho-update"
+}

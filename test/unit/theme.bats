@@ -89,3 +89,19 @@ teardown() { rm -rf "$HOME"; }
     [ "$(ls "$d/backgrounds" | wc -l)" -eq 1 ]
   done
 }
+
+@test "theme-set rejects colors that are not #rrggbb and keys that could corrupt the templates (review I6)" {
+  d="$HOME/.config/gentoozinho/themes/bad"
+  mkdir -p "$d/backgrounds"
+  cp "$REPO"/themes/nord/backgrounds/* "$d/backgrounds/"
+  sed -e 's/^accent = .*/accent = "red"/' -e 's/^foreground = .*/foreground = "#fff"/' "$REPO/themes/nord/colors.toml" > "$d/colors.toml"
+  run gentoozinho-theme-set bad
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"accent"* ]]
+  [[ "$output" == *"#rrggbb"* ]]
+  [ "$(gentoozinho-theme-current)" = none ]
+  printf 'accent = "#7aa2f7"\nfore|ground = "#a9b1d6"\n' > "$d/colors.toml"
+  run gentoozinho-theme-set bad
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"key"* ]]
+}

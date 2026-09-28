@@ -3,6 +3,9 @@ gz_log "gentoozinho installed:"
 gz_log "  profile : gentoozinho:${GZ_TARGET_PROFILE}"
 gz_log "  metas   : ${GZ_METAS}"
 gz_log "  log     : ${GZ_LOG_FILE}"
+if (( ${GZ_USER_CREATED:-0} )); then
+  gz_log "  user    : ${GZ_USER} was created WITHOUT a password; run: passwd ${GZ_USER}"
+fi
 
 if (( GZ_NO_REBOOT )); then
   gz_log "reboot skipped (--no-reboot)"

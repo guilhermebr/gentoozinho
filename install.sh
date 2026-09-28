@@ -27,6 +27,11 @@ trap 'gz_log "FAILED in ${GZ_CURRENT_STEP:-startup}; see ${GZ_LOG_FILE}"' ERR
 gz_log "gentoozinho install starting (profile=${GZ_PROFILE} metas=${GZ_METAS} user=${GZ_USER})"
 
 for stage in preflight portage packages system user finish; do
+  # The desktop session stages only make sense when the desktop meta is chosen.
+  if [[ $stage == system || $stage == user ]] && ! gz_meta_selected desktop; then
+    gz_log "skipping the ${stage} stage: gentoozinho-meta/desktop not selected"
+    continue
+  fi
   for step in "${GZ_SRC}/install/${stage}/"[0-9][0-9]-*.sh; do
     GZ_CURRENT_STEP="${step#"${GZ_SRC}/"}"
     gz_log "==> ${GZ_CURRENT_STEP}"

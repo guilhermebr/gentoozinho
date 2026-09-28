@@ -9,6 +9,7 @@ else
   emerge --getbinpkg --quiet sys-kernel/gentoo-kernel-bin
   if compgen -G "${GZ_ROOT}/var/db/pkg/sys-kernel/gentoo-kernel-[0-9]*" > /dev/null; then
     gz_log "removing the DRM-less source kernel; the new one boots next time"
+    emerge --deselect --quiet sys-kernel/gentoo-kernel || true
     emerge -C --quiet sys-kernel/gentoo-kernel
   fi
 fi

@@ -46,3 +46,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
     [ "${#d}" -le 80 ]
   done
 }
+
+@test "base meta provides sudo for gentoozinho-update (review I4)" {
+  grep -qx $'\tapp-admin/sudo' "$REPO/gentoozinho-meta/base/base-0.ebuild"
+}

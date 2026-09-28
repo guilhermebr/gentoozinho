@@ -4,6 +4,10 @@ set -euo pipefail
 (( EUID == 0 )) || exec sudo "$0" "$@"
 emerge --sync
 emerge --update --deep --newuse --getbinpkg --keep-going=n @world
+# A git live ebuild is never re-merged by a world update.
+if [[ -d /var/db/pkg/app-misc/gentoozinho-9999 ]]; then
+  emerge --oneshot --quiet app-misc/gentoozinho
+fi
 emerge --depclean --pretend
 echo
 echo "Review the --depclean list above; run 'emerge --depclean --ask' to remove."

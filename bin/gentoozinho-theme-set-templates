@@ -13,6 +13,21 @@ hex_to_rgb() { local hex="${1#\#}"; printf '%d,%d,%d' "0x${hex:0:2}" "0x${hex:2:
 
 [[ -f $COLORS_FILE ]] || { echo "gentoozinho-theme-set-templates: $COLORS_FILE missing" >&2; exit 1; }
 
+# Keys become sed patterns and values land in hyprlang/css/toml files: refuse
+# anything that would render a broken (and, for hyprlock, unlockable) config.
+while IFS='=' read -r key value; do
+  key="${key//[\"\' ]/}"
+  [[ $key && $key != \#* ]] || continue
+  value="${value#*[\"\']}"
+  value="${value%%[\"\']*}"
+  if [[ ! $key =~ ^[a-z0-9_]+$ ]]; then
+    echo "gentoozinho-theme-set: colors.toml key '$key' must match [a-z0-9_]" >&2; exit 1
+  fi
+  if [[ ! $value =~ ^#[0-9a-fA-F]{6}$ ]]; then
+    echo "gentoozinho-theme-set: colors.toml key '$key' must be a #rrggbb color (got \"$value\")" >&2; exit 1
+  fi
+done < "$COLORS_FILE"
+
 sed_script="$(mktemp)"
 while IFS='=' read -r key value; do
   key="${key//[\"\' ]/}"
@@ -21,9 +36,7 @@ while IFS='=' read -r key value; do
   value="${value%%[\"\']*}"
   printf 's|{{ %s }}|%s|g\n' "$key" "$value"
   printf 's|{{ %s_strip }}|%s|g\n' "$key" "${value#\#}"
-  if [[ $value =~ ^# ]]; then
-    printf 's|{{ %s_rgb }}|%s|g\n' "$key" "$(hex_to_rgb "$value")"
-  fi
+  printf 's|{{ %s_rgb }}|%s|g\n' "$key" "$(hex_to_rgb "$value")"
 done < "$COLORS_FILE" > "$sed_script"
 
 shopt -s nullglob

@@ -66,3 +66,14 @@ setup() {
   gz_parse_args --autologin
   [ "$GZ_AUTOLOGIN" = 1 ]
 }
+
+@test "gz_meta_selected and --user explicitness (review I1, I3)" {
+  gz_parse_args --metas base
+  run gz_meta_selected desktop
+  [ "$status" -ne 0 ]
+  [ "$GZ_USER_EXPLICIT" = 0 ]
+  gz_parse_args --metas base,desktop --user bob
+  gz_meta_selected desktop
+  gz_meta_selected base
+  [ "$GZ_USER_EXPLICIT" = 1 ]
+}

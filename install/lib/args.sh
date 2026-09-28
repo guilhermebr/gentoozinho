@@ -30,12 +30,13 @@ gz_parse_args() {
   GZ_METAS="base,desktop"
   GZ_NO_REBOOT=0
   GZ_AUTOLOGIN=0
+  GZ_USER_EXPLICIT=0
   GZ_REPO_URL="$GZ_DEFAULT_REPO_URL"
 
   while (( $# )); do
     case "$1" in
       --profile)   gz_need_value "$1" $#; GZ_PROFILE="$2"; shift 2 ;;
-      --user)      gz_need_value "$1" $#; GZ_USER="$2"; shift 2 ;;
+      --user)      gz_need_value "$1" $#; GZ_USER="$2"; GZ_USER_EXPLICIT=1; shift 2 ;;
       --metas)     gz_need_value "$1" $#; GZ_METAS="$2"; shift 2 ;;
       --repo-url)  gz_need_value "$1" $#; GZ_REPO_URL="$2"; shift 2 ;;
       --no-reboot) GZ_NO_REBOOT=1; shift ;;
@@ -58,7 +59,14 @@ gz_parse_args() {
     esac
   done
 
-  export GZ_PROFILE GZ_USER GZ_METAS GZ_NO_REBOOT GZ_AUTOLOGIN GZ_REPO_URL
+  export GZ_PROFILE GZ_USER GZ_USER_EXPLICIT GZ_METAS GZ_NO_REBOOT GZ_AUTOLOGIN GZ_REPO_URL
+}
+
+# gz_meta_selected NAME: 0 when NAME is in GZ_METAS
+gz_meta_selected() {
+  local m
+  for m in ${GZ_METAS//,/ }; do [[ $m == "$1" ]] && return 0; done
+  return 1
 }
 
 # gz_meta_atoms "base,desktop" -> "gentoozinho-meta/base gentoozinho-meta/desktop"

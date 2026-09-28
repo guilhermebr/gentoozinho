@@ -11,6 +11,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 RDEPEND="
+	app-admin/sudo
 	app-editors/neovim
 	app-misc/fastfetch
 	app-misc/jq

@@ -49,11 +49,17 @@ What it does to your system: selects a gentoozinho profile (which inherits
 Gentoo's desktop target), writes a few files named `gentoozinho` under
 `/etc/portage`, enables the guru and hyproverlay overlays, then runs a full
 `emerge --update --deep --newuse @world` plus the meta-packages. On an
-out-of-date system that world update is the slow part. Only the `vm` profile
-on the cloud image has been tested so far; real hardware (`desktop`) is phase
-3. Before trying it on metal: be on a 23.0 systemd profile and have
-`sys-kernel/gentoo-kernel-bin` installed, or `virtual/dist-kernel` will pull
-the source kernel and rebuild it.
+out-of-date system that world update is the slow part. With the desktop meta
+it also: enables SDDM as the display manager and NetworkManager as the
+network stack (systemd-networkd gets disabled, which can drop a remote box);
+deletes `/etc/kernel/config.d/dist-amd64-livecd.config` if present and, when
+no installed kernel has graphics drivers, installs `gentoo-kernel-bin` and
+unmerges the source kernel (its modules are gone until you reboot); creates
+the `--user` account if you ask for one that does not exist, adds it to the
+desktop groups, seeds `~/.config` and appends one line to `~/.bashrc`. Only
+the `vm` profile on the cloud image has been tested so far; real hardware
+(`desktop`) is phase 3. The SDDM greeter itself (without `--autologin`) has
+had only a manual check.
 
 ## Develop
 

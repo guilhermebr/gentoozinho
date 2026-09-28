@@ -56,3 +56,11 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'insinto /usr/share/gentoozinho' "$f"
   bash -n "$f"
 }
+
+@test "payload RDEPEND covers what the scripts, bindings and autostart execute (review I9)" {
+  for f in "$REPO"/app-misc/gentoozinho/*.ebuild; do
+    for atom in gnome-extra/polkit-gnome gui-apps/uwsm x11-misc/xdg-utils app-misc/brightnessctl gui-apps/hyprpicker gui-apps/swaybg; do
+      grep -qx $'\t'"$atom" "$f"
+    done
+  done
+}

@@ -9,7 +9,8 @@ gz_user_groups() { echo "wheel,users,video,audio,input,plugdev"; }
 gz_run_as_user() {
   local user="$1"; shift
   local home; home="$(getent passwd "$user" | cut -d: -f6)"
-  sudo -u "$user" env HOME="$home" PATH="/usr/bin:/bin:/usr/local/bin" "$@"
+  # runuser is util-linux, present on every Gentoo; the installer runs as root.
+  runuser -u "$user" -- env HOME="$home" PATH="/usr/bin:/bin:/usr/local/bin" "$@"
 }
 
 # gz_sddm_conf USER AUTOLOGIN(0|1): print /etc/sddm.conf.d/10-gentoozinho.conf

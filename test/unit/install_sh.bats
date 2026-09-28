@@ -93,3 +93,27 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'app-misc/gentoozinho-9999' "$f"
   grep -q 'emerge --oneshot' "$f"
 }
+
+@test "system and user stages only run when the desktop meta is selected (review I1)" {
+  grep -q 'gz_meta_selected desktop' "$REPO/install.sh"
+}
+
+@test "user stage sets the default theme only once, refuses an implicit missing user, and needs no sudo (review I2, I3, I4)" {
+  grep -q 'gentoozinho-theme-current' "$REPO/install/user/30-theme.sh"
+  grep -q 'GZ_USER_EXPLICIT' "$REPO/install/user/10-account.sh"
+  grep -q 'passwd' "$REPO/install/finish/10-summary.sh"
+  grep -q 'runuser' "$REPO/install/lib/user.sh"
+  run grep -q 'sudo' "$REPO/install/lib/user.sh"
+  [ "$status" -ne 0 ]
+}
+
+@test "kernel step deselects the source kernel before unmerging it (review I8)" {
+  grep -q -- '--deselect' "$REPO/install/system/05-kernel.sh"
+}
+
+@test "greeter compositor config has no gaps and fullscreens the greeter (review I10)" {
+  f="$REPO/default/sddm/hyprland.conf"
+  grep -qE '^\s*gaps_out = 0' "$f"
+  grep -qE '^\s*border_size = 0' "$f"
+  grep -q 'windowrule = fullscreen on, match:class' "$f"
+}

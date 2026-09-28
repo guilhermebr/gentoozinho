@@ -42,3 +42,8 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'lock_cmd = gentoozinho-system-lock' "$REPO/config/hypr/hypridle.conf"
   grep -q 'source = ~/.config/gentoozinho/current/theme/hyprlock.conf' "$REPO/config/hypr/hyprlock.conf"
 }
+
+@test "no binding powers off without confirmation (review I7)" {
+  run grep -r 'systemctl poweroff' "$REPO/default/hypr"
+  [ "$status" -ne 0 ]
+}
