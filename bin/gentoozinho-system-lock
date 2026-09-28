@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Lock the screen with hyprlock (once).
+set -euo pipefail
+pidof hyprlock > /dev/null || exec hyprlock

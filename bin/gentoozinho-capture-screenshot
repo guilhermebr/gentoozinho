@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Screenshot a region (default), window or output into ~/Pictures/Screenshots.
+set -euo pipefail
+dir="${GENTOOZINHO_SCREENSHOT_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$dir"
+hyprshot -m "${1:-region}" -o "$dir" --silent
+notify-send -u low "Screenshot saved" "$dir" || true

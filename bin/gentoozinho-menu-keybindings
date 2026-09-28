@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Show every described key binding in a searchable list.
+set -euo pipefail
+hyprctl -j binds \
+  | jq -r '.[] | select(.has_description) | "\(.modmask) \(.key)\t\(.description)"' \
+  | walker --dmenu -p "Keybindings"

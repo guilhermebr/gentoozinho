@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Open the terminal; args are passed through (e.g. -e btop).
+set -euo pipefail
+exec alacritty "$@"

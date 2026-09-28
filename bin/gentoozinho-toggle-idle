@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Toggle idle locking (hypridle).
+set -euo pipefail
+if pgrep -x hypridle > /dev/null; then
+  pkill -x hypridle
+  notify-send -u low "Idle locking off" || true
+else
+  setsid -f uwsm-app -- hypridle > /dev/null 2>&1
+  notify-send -u low "Idle locking on" || true
+fi

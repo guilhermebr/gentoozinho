@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Open the default browser, optionally at a URL.
+set -euo pipefail
+exec xdg-open "${1:-about:blank}"

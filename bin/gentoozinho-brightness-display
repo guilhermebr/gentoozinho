@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Change display brightness (brightnessctl syntax, default +5%) with an OSD.
+set -euo pipefail
+brightnessctl -q set "${1:-+5%}"
+level="$(brightnessctl -m | cut -d, -f4 | tr -d %)"
+gentoozinho-swayosd-client --brightness "$level" || true

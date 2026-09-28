@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Restart the notification daemon.
+set -euo pipefail
+pkill -x mako || true
+setsid -f uwsm-app -- mako > /dev/null 2>&1

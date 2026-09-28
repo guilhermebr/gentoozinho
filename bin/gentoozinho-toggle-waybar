@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Hide or show the top bar.
+set -euo pipefail
+if pgrep -x waybar > /dev/null; then pkill -x waybar; else gentoozinho-restart-waybar; fi

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Open the launcher; extra args select a walker module, e.g. -m clipboard.
+set -euo pipefail
+exec walker "$@"

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Show an on-screen display; starts swayosd-server on demand.
+set -euo pipefail
+if ! pgrep -x swayosd-server > /dev/null; then
+  setsid -f swayosd-server > /dev/null 2>&1
+  sleep 0.2
+fi
+exec swayosd-client "$@"

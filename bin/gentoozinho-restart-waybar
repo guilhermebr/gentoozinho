@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Restart the top bar (used after theme changes).
+set -euo pipefail
+pkill -x waybar || true
+setsid -f uwsm-app -- waybar > /dev/null 2>&1

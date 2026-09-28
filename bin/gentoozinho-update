@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Update the whole system the Gentoo way. Wraps the Handbook sequence.
+set -euo pipefail
+(( EUID == 0 )) || exec sudo "$0" "$@"
+emerge --sync
+emerge --update --deep --newuse --getbinpkg --keep-going=n @world
+emerge --depclean --pretend
+echo
+echo "Review the --depclean list above; run 'emerge --depclean --ask' to remove."
+echo "Run 'dispatch-conf' if config files need merging."

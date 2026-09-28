@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Toggle mako do-not-disturb mode.
+set -euo pipefail
+makoctl mode -t do-not-disturb
