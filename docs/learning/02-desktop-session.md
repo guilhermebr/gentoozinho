@@ -53,15 +53,36 @@ we did with it, what broke.
 - The polkit agent is `/usr/libexec/polkit-gnome-authentication-agent-1`
   (`gnome-extra/polkit-gnome`), started from autostart.
 
-## hyprlang `.conf` today, Lua tomorrow
+## From hyprlang to Lua (Hyprland 0.56 → 0.57)
 
-- Hyprland 0.56.2 still parses the classic `.conf` (`Hyprland
-  --verify-config` prints `config ok` for our assembled config), which let us
-  port Omarchy v3.8.4's hyprlang files directly.
-- The running session shows a notification: **".conf config format, support
-  for which will be removed in Hyprland 0.57"**. Even hyprctl's own recovery
-  hint is Lua now (`hyprctl eval 'hl.clear_crashed_lockscreen()'`). The Lua
-  migration is the next structural job; Omarchy 4 already did it upstream.
+- 0.56 still parses `.conf` but warns in-session that 0.57 removes it, so the
+  whole layer moved to Lua the same day phase 2 landed.
+- The `hl` API lives in `/usr/share/hypr/stubs/hl.meta.lua`: `hl.config` for
+  settings, `hl.bind(keys, dispatcher, opts)` with `hl.dsp.*` dispatchers,
+  `hl.window_rule`/`hl.layer_rule` tables, `hl.env`, `hl.monitor`,
+  `hl.on("hyprland.start", fn)` plus `hl.exec_cmd` for autostart, `hl.curve`
+  and `hl.animation`. Dispatcher functions are variadic in the stub; the
+  example config and Omarchy v4 show the table shapes (`focus({ direction =
+  "l" })`, `window.resize({ x = -100, y = 0, relative = true })`).
+- Files are plain Lua modules resolved through `package.path`;
+  `default/hypr/bootstrap.lua` sets it to `~/.local/state`, `~/.config`, then
+  `/usr/share/gentoozinho`, and clears cached `default.*`/`hypr.*`/
+  `gentoozinho.*` modules so `hyprctl reload` re-reads edits. The theme
+  fragment is just another module (`gentoozinho.current.theme.hyprland`)
+  found through the `~/.config` entry.
+- `gz` (alias `o`, so Omarchy snippets paste in) wraps the few idioms the
+  bindings need: command strings become `hl.dsp.exec_cmd`, `{ launch = }`
+  prepends `uwsm-app --`, `gz.window(match, rules)` builds the rule table.
+- Clipboard shortcuts use `send_key_state` with a 50 ms down/up split (from
+  Omarchy v4) rather than `send_shortcut`, which can leave synthetic keys stuck.
+- Because Hyprland keeps loading `hyprland.conf` when it exists,
+  `gentoozinho-refresh-config --init` moves a hyprlang home to
+  `~/.config/hypr/pre-lua/` before seeding Lua; the installer's user stage
+  runs it, so an upgrade migrates itself.
+- The modules are real Lua, so `test/lua.sh` runs them on the host under a
+  recording fake `hl` and checks binds, descriptions, commands, autostart and
+  the theme hook in a second. Hyprland's `--verify-config` then confirms the
+  compositor accepts the same files.
 
 ## The theme engine
 

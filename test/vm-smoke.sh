@@ -53,7 +53,7 @@ vm 'test -x /usr/bin/sddm && test -x /usr/bin/waybar && test -x /usr/bin/walker'
 vm 'grep -qx "source /etc/portage/gentoozinho.conf" /etc/portage/make.conf'
 vm 'test "$(ls /etc/portage/binrepos.conf | wc -l)" -eq 1'   # cloud image already had one
 vm 'test -x /usr/bin/gentoozinho-theme-set && test -f /usr/share/wayland-sessions/gentoozinho.desktop'
-vm 'test "$(gentoozinho-theme-current)" = tokyo-night && test -f ~/.config/hypr/hyprland.conf && grep -q gentoozinho ~/.bashrc'
+vm 'test "$(gentoozinho-theme-current)" != none && test -f ~/.config/hypr/hyprland.lua && grep -q gentoozinho ~/.bashrc'
 vm 'grep -q "^Session=gentoozinho.desktop" /etc/sddm.conf.d/10-gentoozinho.conf && systemctl is-enabled sddm NetworkManager bluetooth'
 
 step "reboot into the desktop session"

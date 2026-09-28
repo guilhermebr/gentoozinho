@@ -199,6 +199,11 @@ A versioned ebuild is added once the first tag exists. Updating the desktop is
 `gentoozinho-update`, which runs `emerge --sync`, `emerge -uDN @world`,
 `emerge --depclean --ask`, and `dispatch-conf` reminders.
 
+The Hyprland configuration format is Lua since 2026-09-28; see
+`docs/superpowers/specs/2026-09-28-lua-config-design.md`. The `.conf`
+examples below describe the original phase 2 layout; the file names are now
+`.lua` and `source =` lines are `require` calls.
+
 User configuration follows Omarchy's split. On first install (or with
 `gentoozinho-refresh-config`), files from `config/` are copied into
 `~/.config/`. The user's `~/.config/hypr/hyprland.conf` looks like:

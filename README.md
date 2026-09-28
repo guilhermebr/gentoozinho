@@ -21,9 +21,13 @@ profiles, meta-packages and installer on the official Gentoo cloud-init image
 `docs/superpowers/specs/2026-09-27-gentoozinho-design.md`. Notes on what the
 work taught: `docs/learning/`.
 
-Known: Hyprland 0.56 warns that `.conf` config support ends in 0.57; the Lua
-migration is the next structural job. Real hardware (`desktop` profile) is
-still untested (phase 3). A 20 GB disk is tight for a VM that compiles; give it
+Hyprland is configured in Lua (Hyprland 0.57 drops the old `.conf` format):
+your files are `~/.config/hypr/*.lua`, `gz.bind(keys, description, command)`
+adds a binding, `gz.rebind` replaces one, and the full API is described in
+`/usr/share/hypr/stubs/hl.meta.lua`. A phase 2 install is migrated on the next
+installer run (old files land in `~/.config/hypr/pre-lua/`).
+
+Known: real hardware (`desktop` profile) is still untested (phase 3). A 20 GB disk is tight for a VM that compiles; give it
 25 GB or more.
 
 Configs and themes are adapted from [Omarchy](https://omarchy.org) v3.8.4
