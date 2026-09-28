@@ -19,11 +19,16 @@ fi
 
 step() { printf '\n### %s\n' "$*"; }
 
-step "copy working tree into the VM"
-tar --exclude=.git -cz . | vm 'rm -rf ~/src && mkdir ~/src && tar xz -C ~/src'
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "commit first: app-misc/gentoozinho is a git live ebuild and installs the committed HEAD" >&2
+  exit 1
+fi
+
+step "copy working tree (with .git) into the VM"
+tar --exclude=test/artifacts -cz . | vm 'rm -rf ~/src && mkdir ~/src && tar xz -C ~/src'
 
 step "first install"
-vm 'sudo ~/src/install.sh --profile vm --no-reboot --repo-url "$HOME/src"'
+vm 'sudo ~/src/install.sh --profile vm --no-reboot --autologin --repo-url "$HOME/src"'
 
 step "assertions"
 vm 'eselect profile show | grep -q "gentoozinho:vm"'
@@ -33,6 +38,28 @@ vm 'Hyprland --version'
 vm 'test -x /usr/bin/sddm && test -x /usr/bin/waybar && test -x /usr/bin/walker'
 vm 'grep -qx "source /etc/portage/gentoozinho.conf" /etc/portage/make.conf'
 vm 'test "$(ls /etc/portage/binrepos.conf | wc -l)" -eq 1'   # cloud image already had one
+vm 'test -x /usr/bin/gentoozinho-theme-set && test -f /usr/share/wayland-sessions/gentoozinho.desktop'
+vm 'test "$(gentoozinho-theme-current)" = tokyo-night && test -f ~/.config/hypr/hyprland.conf && grep -q gentoozinho ~/.bashrc'
+vm 'grep -q "^Session=gentoozinho.desktop" /etc/sddm.conf.d/10-gentoozinho.conf && systemctl is-enabled sddm NetworkManager bluetooth'
+
+step "reboot into the desktop session"
+vm 'sudo systemctl reboot' || true
+sleep 20
+for _ in $(seq 1 30); do vm true 2> /dev/null && break; sleep 5; done
+vm 'systemctl is-active sddm'
+vm 'systemctl is-active NetworkManager'
+vm 'for _ in $(seq 1 30); do pgrep -x Hyprland > /dev/null && break; sleep 2; done; pgrep -x Hyprland'
+vm 'loginctl list-sessions --no-legend | grep -q "$(id -un)"'
+vm 'sleep 5; pgrep -x waybar && pgrep -x mako && pgrep -x hypridle && pgrep -x hyprpaper'
+
+step "screenshot from inside the session"
+mkdir -p test/artifacts
+vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR | grep -m1 "^wayland-[0-9]$"); grim /tmp/shot.png && hyprctl -j clients > /tmp/clients.json'
+vm 'cat /tmp/shot.png' > test/artifacts/smoke.png
+[[ -s test/artifacts/smoke.png ]]
+
+step "theme switching inside the session"
+vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); gentoozinho-theme-set catppuccin && test "$(gentoozinho-theme-current)" = catppuccin && hyprctl getoption general:col.active_border | grep -qi 89b4fa'
 
 step "second run (no --profile: auto-detect must keep vm) changes nothing under /etc/portage"
 before="$(vm 'sudo find /etc/portage -type f -exec md5sum {} + | sort | md5sum')"
