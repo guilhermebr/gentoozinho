@@ -61,6 +61,15 @@ vm 'cat /tmp/shot.png' > test/artifacts/smoke.png
 step "theme switching inside the session"
 vm 'export XDG_RUNTIME_DIR=/run/user/$(id -u); export HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1); gentoozinho-theme-set catppuccin && test "$(gentoozinho-theme-current)" = catppuccin && hyprctl getoption general:col.active_border | grep -qi 89b4fa'
 
+step "SDDM greeter without autologin (Hyprland as greeter compositor)"
+vm 'sudo sed -i "/^\[Autologin\]/,\$d" /etc/sddm.conf.d/10-gentoozinho.conf && sudo systemctl restart sddm'
+sleep 20
+vm 'pgrep -f sddm-greeter-qt6 > /dev/null && pgrep -x Hyprland > /dev/null'
+vm 'sudo journalctl -u sddm --since -30s --no-pager | grep -qi CrashExit && exit 1 || true'
+vm 'sock=$(sudo ls /run/user/$(id -u sddm) | grep -m1 "^wayland-[0-9]$"); sudo -u sddm env XDG_RUNTIME_DIR=/run/user/$(id -u sddm) WAYLAND_DISPLAY=$sock timeout 20 grim /tmp/greeter.png && sudo chmod 644 /tmp/greeter.png'
+vm 'cat /tmp/greeter.png' > test/artifacts/greeter.png
+[[ -s test/artifacts/greeter.png ]]
+
 step "second run (no --profile: auto-detect must keep vm) changes nothing under /etc/portage"
 before="$(vm 'sudo find /etc/portage -type f -exec md5sum {} + | sort | md5sum')"
 vm 'sudo ~/src/install.sh --no-reboot --repo-url "$HOME/src"'

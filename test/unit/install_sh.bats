@@ -117,3 +117,8 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -qE '^\s*border_size = 0' "$f"
   grep -q 'windowrule = fullscreen on, match:class' "$f"
 }
+
+@test "smoke test also exercises the SDDM greeter without autologin (review I10)" {
+  grep -q 'sddm-greeter-qt6' "$REPO/test/vm-smoke.sh"
+  grep -q 'greeter.png' "$REPO/test/vm-smoke.sh"
+}

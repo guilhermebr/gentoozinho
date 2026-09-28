@@ -20,7 +20,6 @@ gz_sddm_conf() {
 # Managed by gentoozinho.
 [General]
 DisplayServer=wayland
-GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
 [Wayland]
 CompositorCommand=Hyprland -c /usr/share/gentoozinho/default/sddm/hyprland.conf
