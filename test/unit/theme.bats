@@ -26,6 +26,8 @@ teardown() { rm -rf "$HOME"; }
   grep -q 'background = "#1a1b26"' "$t/alacritty.toml"
   [ "$(cat "$HOME/.config/gentoozinho/current/theme.name")" = tokyo-night ]
   [ -L "$HOME/.config/gentoozinho/current/background" ]
+  grep -q "^wallpaper = , $HOME/.config/gentoozinho/current/background$" "$HOME/.config/hypr/hyprpaper.conf"
+  grep -q "^preload = $HOME/.config/gentoozinho/current/background$" "$HOME/.config/hypr/hyprpaper.conf"
 }
 
 @test "theme-set works with no compositor running (review focus 1)" {

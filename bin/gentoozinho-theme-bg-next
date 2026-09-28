@@ -13,6 +13,13 @@ for i in "${!bgs[@]}"; do
   if [[ ${bgs[$i]} == "$now" ]]; then next="${bgs[$(( (i + 1) % ${#bgs[@]} ))]}"; break; fi
 done
 ln -sfn "$next" "$CURRENT/background"
+
+# hyprpaper needs a config; point it at the stable symlink so a theme or
+# background change only needs a reload.
+mkdir -p "$HOME/.config/hypr"
+printf 'preload = %s\nwallpaper = , %s\nsplash = false\n' "$CURRENT/background" "$CURRENT/background" > "$HOME/.config/hypr/hyprpaper.conf"
 if command -v hyprctl > /dev/null && pgrep -x hyprpaper > /dev/null; then
-  hyprctl hyprpaper reload ",$next" > /dev/null || true
+  hyprctl hyprpaper unload all > /dev/null || true
+  hyprctl hyprpaper preload "$CURRENT/background" > /dev/null || true
+  hyprctl hyprpaper wallpaper ", $CURRENT/background" > /dev/null || true
 fi
