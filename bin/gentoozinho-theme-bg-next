@@ -14,12 +14,19 @@ for i in "${!bgs[@]}"; do
 done
 ln -sfn "$next" "$CURRENT/background"
 
-# hyprpaper needs a config; point it at the stable symlink so a theme or
-# background change only needs a reload.
+# hyprpaper (0.8+) reads a wallpaper block; point it at the stable symlink and
+# restart hyprpaper when it is running so the change shows immediately.
 mkdir -p "$HOME/.config/hypr"
-printf 'preload = %s\nwallpaper = , %s\nsplash = false\n' "$CURRENT/background" "$CURRENT/background" > "$HOME/.config/hypr/hyprpaper.conf"
-if command -v hyprctl > /dev/null && pgrep -x hyprpaper > /dev/null; then
-  hyprctl hyprpaper unload all > /dev/null || true
-  hyprctl hyprpaper preload "$CURRENT/background" > /dev/null || true
-  hyprctl hyprpaper wallpaper ", $CURRENT/background" > /dev/null || true
+cat > "$HOME/.config/hypr/hyprpaper.conf" <<EOF_HP
+splash = false
+
+wallpaper {
+    monitor =
+    path = $CURRENT/background
+    fit_mode = cover
+}
+EOF_HP
+if pgrep -x hyprpaper > /dev/null; then
+  pkill -x hyprpaper || true
+  setsid -f uwsm-app -- hyprpaper > /dev/null 2>&1 || setsid -f hyprpaper > /dev/null 2>&1 || true
 fi
