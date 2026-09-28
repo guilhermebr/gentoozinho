@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Switch to the next theme in alphabetical order (wrapping).
+set -euo pipefail
+mapfile -t themes < <(gentoozinho-theme-list)
+cur="$(gentoozinho-theme-current)"
+next="${themes[0]}"
+for i in "${!themes[@]}"; do
+  if [[ ${themes[$i]} == "$cur" ]]; then next="${themes[$(( (i + 1) % ${#themes[@]} ))]}"; break; fi
+done
+gentoozinho-theme-set "$next"
+if command -v notify-send > /dev/null; then notify-send -u low "Theme: $next" || true; fi

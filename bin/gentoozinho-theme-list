@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# List shipped and user themes, sorted, one per line.
+set -euo pipefail
+GENTOOZINHO_PATH="${GENTOOZINHO_PATH:-/usr/share/gentoozinho}"
+shopt -s nullglob
+for d in "$GENTOOZINHO_PATH"/themes/*/ "$HOME"/.config/gentoozinho/themes/*/; do
+  basename "$d"
+done | sort -u

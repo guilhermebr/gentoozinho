@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Adapted from Omarchy v3.8.4 (MIT)
+# --init : copy every file from the config templates into ~/.config that does
+#          not exist yet (never overwrites).
+# PATH   : replace ~/.config/PATH with the template, keeping a timestamped backup.
+set -euo pipefail
+GENTOOZINHO_PATH="${GENTOOZINHO_PATH:-/usr/share/gentoozinho}"
+src_root="$GENTOOZINHO_PATH/config"
+
+case "${1:-}" in
+  --init)
+    while IFS= read -r -d '' f; do
+      rel="${f#"$src_root"/}"
+      dst="$HOME/.config/$rel"
+      [[ -e $dst ]] && continue
+      mkdir -p "$(dirname "$dst")"
+      cp "$f" "$dst"
+    done < <(find "$src_root" -type f -print0)
+    ;;
+  "")
+    echo "usage: gentoozinho-refresh-config --init | <path under ~/.config>" >&2; exit 1 ;;
+  *)
+    src="$src_root/$1"; dst="$HOME/.config/$1"
+    [[ -f $src ]] || { echo "no template for $1" >&2; exit 1; }
+    mkdir -p "$(dirname "$dst")"
+    if [[ -f $dst ]]; then
+      bak="$dst.bak.$(date +%s)"
+      cp -f "$dst" "$bak"
+      cp -f "$src" "$dst"
+      if cmp -s "$dst" "$bak"; then rm -f "$bak"; else echo "Replaced $dst (backup: $bak)"; fi
+    else
+      cp -f "$src" "$dst"
+    fi
+    ;;
+esac

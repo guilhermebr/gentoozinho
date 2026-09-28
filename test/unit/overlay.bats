@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+bats_require_minimum_version 1.5.0
 # Structural checks on the ebuild repository. Real validation happens in the
 # VM smoke test; these catch typos before a VM is ever booted.
 

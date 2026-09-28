@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Adapted from Omarchy v3.8.4 (MIT)
+# Render default/themed/*.tpl (and ~/.config/gentoozinho/themed/*.tpl) with the
+# colors of the theme staged in ~/.config/gentoozinho/current/next-theme.
+set -euo pipefail
+GENTOOZINHO_PATH="${GENTOOZINHO_PATH:-/usr/share/gentoozinho}"
+TEMPLATES_DIR="$GENTOOZINHO_PATH/default/themed"
+USER_TEMPLATES_DIR="$HOME/.config/gentoozinho/themed"
+NEXT_THEME_DIR="$HOME/.config/gentoozinho/current/next-theme"
+COLORS_FILE="$NEXT_THEME_DIR/colors.toml"
+
+hex_to_rgb() { local hex="${1#\#}"; printf '%d,%d,%d' "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"; }
+
+[[ -f $COLORS_FILE ]] || { echo "gentoozinho-theme-set-templates: $COLORS_FILE missing" >&2; exit 1; }
+
+sed_script="$(mktemp)"
+while IFS='=' read -r key value; do
+  key="${key//[\"\' ]/}"
+  [[ $key && $key != \#* ]] || continue
+  value="${value#*[\"\']}"
+  value="${value%%[\"\']*}"
+  printf 's|{{ %s }}|%s|g\n' "$key" "$value"
+  printf 's|{{ %s_strip }}|%s|g\n' "$key" "${value#\#}"
+  if [[ $value =~ ^# ]]; then
+    printf 's|{{ %s_rgb }}|%s|g\n' "$key" "$(hex_to_rgb "$value")"
+  fi
+done < "$COLORS_FILE" > "$sed_script"
+
+shopt -s nullglob
+for tpl in "$USER_TEMPLATES_DIR"/*.tpl "$TEMPLATES_DIR"/*.tpl; do
+  out="$NEXT_THEME_DIR/$(basename "$tpl" .tpl)"
+  [[ -f $out ]] || sed -f "$sed_script" "$tpl" > "$out"
+done
+rm -f "$sed_script"

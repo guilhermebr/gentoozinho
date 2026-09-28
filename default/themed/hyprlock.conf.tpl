@@ -1,0 +1,6 @@
+# Adapted from Omarchy v3.8.4 (MIT)
+$color = rgba({{ background_rgb }}, 1.0)
+$inner_color = rgba({{ background_rgb }}, 0.8)
+$outer_color = rgba({{ foreground_rgb }}, 1.0)
+$font_color = rgba({{ foreground_rgb }}, 1.0)
+$check_color = rgba({{ accent_rgb }}, 1.0)

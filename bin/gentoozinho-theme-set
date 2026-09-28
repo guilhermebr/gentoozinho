@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Adapted from Omarchy v3.8.4 (MIT)
+# Apply a theme: stage it, render templates, swap it in, pick a background,
+# and reload whatever is running. Safe to run without a compositor.
+set -euo pipefail
+GENTOOZINHO_PATH="${GENTOOZINHO_PATH:-/usr/share/gentoozinho}"
+[[ -n ${1:-} ]] || { echo "usage: gentoozinho-theme-set <theme-name>" >&2; exit 1; }
+
+CURRENT="$HOME/.config/gentoozinho/current"
+NEXT="$CURRENT/next-theme"
+name="$(echo "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')"
+src=""
+for candidate in "$HOME/.config/gentoozinho/themes/$name" "$GENTOOZINHO_PATH/themes/$name"; do
+  if [[ -d $candidate ]]; then src="$candidate"; break; fi
+done
+[[ -n $src ]] || { echo "Theme '$name' does not exist" >&2; exit 1; }
+[[ -f $src/colors.toml ]] || { echo "Theme '$name' has no colors.toml" >&2; exit 1; }
+
+rm -rf "$NEXT"
+mkdir -p "$NEXT"
+cp -r "$src"/. "$NEXT"/
+gentoozinho-theme-set-templates
+
+rm -rf "$CURRENT/theme"
+mv "$NEXT" "$CURRENT/theme"
+echo "$name" > "$CURRENT/theme.name"
+
+# GTK css cannot @import a ~ path, so apps that need the themed colors get a
+# stable symlink next to their own style sheet.
+mkdir -p "$HOME/.config/walker/themes" "$HOME/.config/swayosd"
+ln -sfn "$CURRENT/theme/walker.css" "$HOME/.config/walker/themes/gentoozinho-colors.css"
+ln -sfn "$CURRENT/theme/swayosd.css" "$HOME/.config/swayosd/colors.css"
+
+gentoozinho-theme-bg-next
+
+# Reload running components only.
+if command -v hyprctl > /dev/null && pgrep -x Hyprland > /dev/null; then hyprctl reload > /dev/null || true; fi
+if pgrep -x waybar > /dev/null; then gentoozinho-restart-waybar || true; fi
+if pgrep -x mako > /dev/null; then makoctl reload || true; fi
+if pgrep -x swayosd-server > /dev/null; then pkill -x swayosd-server; setsid -f swayosd-server > /dev/null 2>&1 || true; fi

@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+bats_require_minimum_version 1.5.0
 # install.sh is exercised for real in test/vm-smoke.sh. Here we only check the
 # parts that do not need root: help, argument errors, and stage ordering.
 
