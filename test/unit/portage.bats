@@ -59,6 +59,7 @@ fingerprint() { (cd "$GZ_ROOT" && find etc -type f | sort | xargs md5sum); }
   [ "$a" = "$(fingerprint)" ]
   grep -qx '\*/\*::hyproverlay ~amd64' "$ETC/package.accept_keywords/gentoozinho"
   grep -qx '\*/\*::gentoozinho ~amd64' "$ETC/package.accept_keywords/gentoozinho"
+  grep -qx 'app-misc/gentoozinho \*\*' "$ETC/package.accept_keywords/gentoozinho"
   grep -qx 'gui-apps/uwsm ~amd64' "$ETC/package.accept_keywords/gentoozinho"
   grep -qx 'dev-cpp/sdbus-c++ ~amd64' "$ETC/package.accept_keywords/gentoozinho"
   grep -qx 'app-shells/zoxide ~amd64' "$ETC/package.accept_keywords/gentoozinho"

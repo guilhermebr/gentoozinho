@@ -81,3 +81,9 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'gentoozinho-theme-set' "$REPO/install/user/30-theme.sh"
   grep -q 'source /usr/share/gentoozinho/default/bash/rc' "$REPO/install/user/40-shell.sh"
 }
+
+@test "the cloud image's headless kernel config is removed before packages, and a DRM kernel is ensured" {
+  grep -q 'dist-amd64-livecd.config' "$REPO/install/portage/45-kernel-config.sh"
+  grep -q 'gz_kernel_has_drm' "$REPO/install/system/05-kernel.sh"
+  grep -q 'sys-kernel/gentoo-kernel-bin' "$REPO/install/system/05-kernel.sh"
+}

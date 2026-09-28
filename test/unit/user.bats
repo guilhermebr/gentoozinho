@@ -27,3 +27,15 @@ setup() {
   [[ "$out" == *"User=alice"* ]]
   [[ "$out" == *"Session=gentoozinho.desktop"* ]]
 }
+
+@test "gz_kernel_has_drm looks for DRM modules in any installed kernel or a built-in drm" {
+  tmp="$(mktemp -d)"
+  run gz_kernel_has_drm "$tmp/lib/modules" "$tmp/sys/module"
+  [ "$status" -ne 0 ]
+  mkdir -p "$tmp/lib/modules/6.18.50/kernel/drivers/gpu/drm"
+  gz_kernel_has_drm "$tmp/lib/modules" "$tmp/sys/module"
+  rm -rf "$tmp/lib"
+  mkdir -p "$tmp/sys/module/drm"
+  gz_kernel_has_drm "$tmp/lib/modules" "$tmp/sys/module"
+  rm -rf "$tmp"
+}

@@ -79,6 +79,8 @@ gz_write_portage_config() {
 */*::hyproverlay ~amd64
 */*::gentoozinho ~amd64
 */*::guru ~amd64
+# The payload is a git live ebuild (no KEYWORDS at all), so it needs **.
+app-misc/gentoozinho **
 # Packages in ::gentoo that are still ~amd64 but the desktop needs.
 gui-apps/uwsm ~amd64
 dev-cpp/sdbus-c++ ~amd64

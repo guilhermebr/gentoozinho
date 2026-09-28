@@ -33,3 +33,11 @@ Session=gentoozinho.desktop
 EOF_AUTO
   fi
 }
+
+# gz_kernel_has_drm MODULES_DIR SYS_MODULE_DIR: 0 when any installed kernel
+# ships DRM modules, or the running kernel has DRM built in.
+gz_kernel_has_drm() {
+  local moddir="$1" sysmod="$2"
+  compgen -G "$moddir/*/kernel/drivers/gpu/drm" > /dev/null && return 0
+  [[ -d $sysmod/drm ]]
+}
