@@ -11,3 +11,5 @@ source "${GZ_LIB}/portage.sh"
 source "${GZ_LIB}/checks.sh"
 # shellcheck source=install/lib/args.sh
 source "${GZ_LIB}/args.sh"
+# shellcheck source=install/lib/user.sh
+source "${GZ_LIB}/user.sh"

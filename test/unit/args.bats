@@ -59,3 +59,10 @@ setup() {
   [ "$(gz_repo_kind https://github.com/guilhermebr/gentoozinho.git)" = git ]
   rmdir "$d"
 }
+
+@test "--autologin flag" {
+  gz_parse_args
+  [ "$GZ_AUTOLOGIN" = 0 ]
+  gz_parse_args --autologin
+  [ "$GZ_AUTOLOGIN" = 1 ]
+}

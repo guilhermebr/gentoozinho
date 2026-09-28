@@ -14,6 +14,7 @@ usage: install.sh [--profile vm|desktop] [--user NAME] [--metas LIST]
   --metas      comma-separated subset of base,desktop,dev,apps
                (default: base,desktop)
   --no-reboot  do not offer to reboot at the end
+  --autologin  log the user straight into the gentoozinho session (SDDM autologin)
   --repo-url   git URL or local directory of the gentoozinho repository
 USAGE
 }
@@ -28,6 +29,7 @@ gz_parse_args() {
   GZ_USER="${SUDO_USER:-gentoo}"
   GZ_METAS="base,desktop"
   GZ_NO_REBOOT=0
+  GZ_AUTOLOGIN=0
   GZ_REPO_URL="$GZ_DEFAULT_REPO_URL"
 
   while (( $# )); do
@@ -37,6 +39,7 @@ gz_parse_args() {
       --metas)     gz_need_value "$1" $#; GZ_METAS="$2"; shift 2 ;;
       --repo-url)  gz_need_value "$1" $#; GZ_REPO_URL="$2"; shift 2 ;;
       --no-reboot) GZ_NO_REBOOT=1; shift ;;
+      --autologin) GZ_AUTOLOGIN=1; shift ;;
       -h|--help)   gz_usage; exit 0 ;;
       *)           gz_usage; gz_die "unknown argument: $1" ;;
     esac
@@ -55,7 +58,7 @@ gz_parse_args() {
     esac
   done
 
-  export GZ_PROFILE GZ_USER GZ_METAS GZ_NO_REBOOT GZ_REPO_URL
+  export GZ_PROFILE GZ_USER GZ_METAS GZ_NO_REBOOT GZ_AUTOLOGIN GZ_REPO_URL
 }
 
 # gz_meta_atoms "base,desktop" -> "gentoozinho-meta/base gentoozinho-meta/desktop"

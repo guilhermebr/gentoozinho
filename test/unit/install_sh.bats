@@ -18,7 +18,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 }
 
 @test "stages run in the documented order" {
-  grep -q 'for stage in preflight portage packages finish' "$REPO/install.sh"
+  grep -q 'for stage in preflight portage packages system user finish' "$REPO/install.sh"
 }
 
 @test "every stage step is a readable bash file with a numeric prefix" {
@@ -70,4 +70,14 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 @test "smoke test exercises profile auto-detection on the second run (review C1)" {
   [ "$(grep -c 'install.sh --profile vm' "$REPO/test/vm-smoke.sh")" -eq 1 ]
   grep -q "install.sh --no-reboot --repo-url" "$REPO/test/vm-smoke.sh"
+}
+
+@test "repos step points git-r3 at a local checkout" {
+  grep -q 'EGIT_OVERRIDE_REPO_GENTOOZINHO' "$REPO/install/portage/30-repos.sh"
+}
+
+@test "user stage seeds config, sets the theme and sources the shell rc as the user" {
+  grep -q 'gentoozinho-refresh-config --init' "$REPO/install/user/20-config.sh"
+  grep -q 'gentoozinho-theme-set' "$REPO/install/user/30-theme.sh"
+  grep -q 'source /usr/share/gentoozinho/default/bash/rc' "$REPO/install/user/40-shell.sh"
 }
