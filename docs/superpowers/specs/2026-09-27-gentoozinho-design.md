@@ -72,7 +72,7 @@ Verified 2026-09-27.
 
 ```
 gentoozinho/
-  metadata/layout.conf            masters = gentoo; repo-name = gentoozinho; thin-manifests
+  metadata/layout.conf            masters = gentoo guru hyproverlay; repo-name = gentoozinho; thin-manifests
   profiles/repo_name              gentoozinho
   profiles/categories             gentoozinho-meta (plus any category we add ebuilds to)
   profiles/{base,vm,desktop}/     custom profiles (section 5)
@@ -109,12 +109,14 @@ without branching in scripts.
 ```
 profiles/base/
   eapi                 5 (profile EAPI; matches what current ::gentoo profiles use)
-  make.defaults        USE="wayland pipewire vulkan bluetooth networkmanager dist-kernel"
+  make.defaults        USE="networkmanager dist-kernel" (targets/desktop provides the rest)
   package.use          per-package USE for the Hypr stack, pipewire, portals, etc.
   package.use.force / package.use.mask   only if a package needs it
 profiles/vm/
-  parent               gentoo:default/linux/amd64/23.0/no-multilib/systemd
-                       ../base
+  parent               gentoo:default/linux/amd64/23.0/no-multilib
+                       gentoo:targets/desktop
+                       gentoo:targets/systemd
+                       ../base       (mirrors gentoo's own desktop/systemd chain)
 profiles/desktop/
   parent               gentoo:default/linux/amd64/23.0/desktop/systemd
                        ../base
@@ -169,9 +171,10 @@ allowed only to make a group optional (for example `nvidia`, `docker`).
 - **dev**: app-containers/docker, app-containers/docker-compose,
   app-containers/docker-buildx, dev-util/mise (ours), app-containers/lazydocker
   (ours), gentoozinho-meta/base.
-- **apps**: www-client/chromium (binary where the binhost offers it),
-  app-office/libreoffice-bin, media-video/mpv, media-gfx/imv,
-  app-text/evince, net-misc/localsend (ours).
+- **apps**: www-client/firefox-bin (chromium was masked for removal from
+  ::gentoo on 2026-09-24; the remaining chromium-based browsers are
+  proprietary and left to the user), app-office/libreoffice-bin,
+  media-video/mpv, media-gfx/imv, app-text/evince, net-misc/localsend (ours).
 
 Exact atoms were confirmed against the tree during planning. Phase 1 ships
 the metas without the ebuilds we have to write ourselves (gum, the payload

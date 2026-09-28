@@ -10,9 +10,16 @@ the Gentoo Foundation, Inc. See <https://www.gentoo.org>.
 
 ## Status
 
-Phase 1: overlay, profiles, meta-packages and installer. Tested against the
-official Gentoo cloud-init image in a govm VM. See
-`docs/superpowers/specs/2026-09-27-gentoozinho-design.md` for the design.
+Phase 1 done: overlay, `vm` and `desktop` profiles, four meta-packages and the
+installer. Proven on the official Gentoo cloud-init image (amd64, systemd) in
+an 8 vCPU QEMU VM: 430 packages merged, 368 as binaries and 62 from source,
+in about 4.5 hours of wall time dominated by gcc 16 and the kernel rebuild.
+The second run is a no-op, `dev` and `apps` resolve, and `pkgcheck` is clean.
+No desktop configuration is installed yet; that is phase 2. Design:
+`docs/superpowers/specs/2026-09-27-gentoozinho-design.md`. Notes on what the
+work taught: `docs/learning/`.
+
+A 20 GB disk is tight for a VM that compiles; give it 25 GB or more.
 
 ## Install
 
