@@ -8,6 +8,10 @@ gz_ensure_line() {
   mkdir -p "$(dirname "$file")"
   [[ -f "$file" ]] || : > "$file"
   grep -qxF -- "$line" "$file" && return 0
+  # A file without a trailing newline would glue our line onto its last one.
+  if [[ -s "$file" && "$(tail -c1 "$file" | wc -l)" -eq 0 ]]; then
+    printf '\n' >> "$file"
+  fi
   printf '%s\n' "$line" >> "$file"
 }
 

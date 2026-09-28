@@ -2,7 +2,7 @@
 # gentoozinho installer: turns a systemd Gentoo into a Hyprland desktop.
 # Idempotent: re-running converges. Everything is logged to
 # /var/log/gentoozinho/install.log.
-set -euo pipefail
+set -Eeuo pipefail
 
 GZ_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export GZ_SRC
@@ -12,6 +12,9 @@ export GZ_ROOT="${GZ_ROOT:-}"
 source "${GZ_SRC}/install/lib/all.sh"
 
 gz_parse_args "$@"
+
+# Root is needed for the log directory itself, so check before anything else.
+gz_check_root "$(id -u)"
 
 if [[ "$GZ_LOG_FILE" != /dev/null ]]; then
   mkdir -p "$(dirname "$GZ_LOG_FILE")"

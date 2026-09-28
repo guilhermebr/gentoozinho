@@ -22,6 +22,14 @@ teardown() { rm -rf "$GZ_ROOT"; }
   [ "$(sed -n 2p "$f")" = 'FEATURES="getbinpkg"' ]
 }
 
+@test "gz_ensure_line first terminates a file that lacks a trailing newline (review I6)" {
+  f="$GZ_ROOT/make.conf"
+  printf 'USE="foo"' > "$f"
+  gz_ensure_line "$f" 'source /etc/portage/gentoozinho.conf'
+  [ "$(sed -n 1p "$f")" = 'USE="foo"' ]
+  [ "$(sed -n 2p "$f")" = 'source /etc/portage/gentoozinho.conf' ]
+}
+
 @test "gz_write_file reports changed, then unchanged, then changed" {
   f="$GZ_ROOT/a/b/file"
   [ "$(printf 'one\n' | gz_write_file "$f")" = changed ]

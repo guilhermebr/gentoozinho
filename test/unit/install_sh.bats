@@ -32,7 +32,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'emerge --pretend' "$f"
   grep -q 'emerge --getbinpkg --keep-going=n' "$f"
   grep -q -- '--update --deep --newuse @world' "$f"
-  ! grep -q 'autounmask' "$f"
+  run ! grep -q 'autounmask' "$f"
 }
 
 @test "finish step never reboots without a tty" {
@@ -54,4 +54,19 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   sync_line="$(grep -n 'emaint sync -r "\$repo"' "$f" | cut -d: -f1)"
   add_line="$(grep -n 'eselect repository add gentoozinho' "$f" | cut -d: -f1)"
   [ -n "$sync_line" ] && [ -n "$add_line" ] && [ "$sync_line" -lt "$add_line" ]
+}
+
+@test "install.sh checks for root before it touches the log directory (review I1)" {
+  root_line="$(grep -n 'gz_check_root' "$REPO/install.sh" | head -1 | cut -d: -f1)"
+  log_line="$(grep -n 'mkdir -p "$(dirname "$GZ_LOG_FILE")"' "$REPO/install.sh" | cut -d: -f1)"
+  [ -n "$root_line" ] && [ -n "$log_line" ] && [ "$root_line" -lt "$log_line" ]
+}
+
+@test "install.sh enables errtrace so the ERR trap fires inside functions (review I5)" {
+  grep -q '^set -Eeuo pipefail' "$REPO/install.sh"
+}
+
+@test "smoke test exercises profile auto-detection on the second run (review C1)" {
+  [ "$(grep -c 'install.sh --profile vm' "$REPO/test/vm-smoke.sh")" -eq 1 ]
+  grep -q "install.sh --no-reboot --repo-url" "$REPO/test/vm-smoke.sh"
 }

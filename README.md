@@ -32,6 +32,16 @@ On a systemd Gentoo (amd64) with network, as root:
 Flags: `--profile vm|desktop`, `--user NAME`, `--metas base,desktop,dev,apps`,
 `--no-reboot`, `--repo-url URL_OR_DIR`.
 
+What it does to your system: selects a gentoozinho profile (which inherits
+Gentoo's desktop target), writes a few files named `gentoozinho` under
+`/etc/portage`, enables the guru and hyproverlay overlays, then runs a full
+`emerge --update --deep --newuse @world` plus the meta-packages. On an
+out-of-date system that world update is the slow part. Only the `vm` profile
+on the cloud image has been tested so far; real hardware (`desktop`) is phase
+3. Before trying it on metal: be on a 23.0 systemd profile and have
+`sys-kernel/gentoo-kernel-bin` installed, or `virtual/dist-kernel` will pull
+the source kernel and rebuild it.
+
 ## Develop
 
     test/unit.sh        # bats unit tests (docker)

@@ -29,7 +29,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q '^USE=".*networkmanager' "$REPO/profiles/base/make.defaults"
   grep -q '^USE=".*dist-kernel' "$REPO/profiles/base/make.defaults"
   # pipewire is a local flag (not in use.desc) and targets/desktop sets it anyway
-  ! grep -q '^USE=".*pipewire' "$REPO/profiles/base/make.defaults"
+  run ! grep -q '^USE=".*pipewire' "$REPO/profiles/base/make.defaults"
 }
 
 @test "base pins hyprland to systemd and uwsm" {

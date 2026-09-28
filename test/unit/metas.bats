@@ -15,7 +15,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
     grep -qx 'LICENSE="metapackage"' "$f"
     grep -qx 'SLOT="0"' "$f"
     grep -qx 'KEYWORDS="~amd64"' "$f"
-    ! grep -q '^SRC_URI=' "$f"
+    run ! grep -q '^SRC_URI=' "$f"
     bash -n "$f"
   done
 }
@@ -24,7 +24,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'gentoozinho-meta/base' "$REPO/gentoozinho-meta/desktop/desktop-0.ebuild"
   grep -q 'gentoozinho-meta/base' "$REPO/gentoozinho-meta/dev/dev-0.ebuild"
   grep -q 'virtual/dist-kernel' "$REPO/gentoozinho-meta/desktop/desktop-0.ebuild"
-  ! grep -rq 'sys-kernel/gentoo-kernel' "$REPO/gentoozinho-meta"
+  run ! grep -rq 'sys-kernel/gentoo-kernel' "$REPO/gentoozinho-meta"
 }
 
 @test "RDEPEND atoms are sorted and unique within each ebuild" {
@@ -36,7 +36,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 
 @test "apps ships firefox-bin, never chromium (last-rited in ::gentoo on 2026-09-24)" {
   grep -q 'www-client/firefox-bin' "$REPO/gentoozinho-meta/apps/apps-0.ebuild"
-  ! grep -rq 'www-client/chromium' "$REPO/gentoozinho-meta"
+  run ! grep -rq 'www-client/chromium' "$REPO/gentoozinho-meta"
 }
 
 @test "DESCRIPTION fits pkgcheck's 80 character limit" {

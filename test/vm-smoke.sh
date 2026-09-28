@@ -34,9 +34,9 @@ vm 'test -x /usr/bin/sddm && test -x /usr/bin/waybar && test -x /usr/bin/walker'
 vm 'grep -qx "source /etc/portage/gentoozinho.conf" /etc/portage/make.conf'
 vm 'test "$(ls /etc/portage/binrepos.conf | wc -l)" -eq 1'   # cloud image already had one
 
-step "second run changes nothing under /etc/portage"
+step "second run (no --profile: auto-detect must keep vm) changes nothing under /etc/portage"
 before="$(vm 'sudo find /etc/portage -type f -exec md5sum {} + | sort | md5sum')"
-vm 'sudo ~/src/install.sh --profile vm --no-reboot --repo-url "$HOME/src"'
+vm 'sudo ~/src/install.sh --no-reboot --repo-url "$HOME/src"'
 after="$(vm 'sudo find /etc/portage -type f -exec md5sum {} + | sort | md5sum')"
 [[ "$before" == "$after" ]] || { echo "FAIL: second run modified /etc/portage"; exit 1; }
 

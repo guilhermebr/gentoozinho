@@ -5,9 +5,13 @@
 GZ_BINHOST_URI="https://distfiles.gentoo.org/releases/amd64/binpackages/23.0/x86-64"
 
 # gz_profile_family PROFILE_PATH -> vm | desktop
-# The cloud image is no-multilib; everything else is treated as a multilib desktop.
+# After the first run make.profile already points at one of our profiles, so
+# recognise those first (a re-run must never flip no-multilib to multilib).
+# Otherwise the cloud image is no-multilib; everything else is a multilib desktop.
 gz_profile_family() {
   case "$1" in
+    */gentoozinho/profiles/vm) echo vm ;;
+    */gentoozinho/profiles/desktop) echo desktop ;;
     *no-multilib*) echo vm ;;
     *) echo desktop ;;
   esac
@@ -49,9 +53,26 @@ gz_tree_needs_sync() {
   fi
 }
 
+# gz_require_dir PATH: die clearly if PATH exists but is a regular file
+# (hand-maintained systems sometimes keep package.* as single files).
+gz_require_dir() {
+  if [[ -e "$1" && ! -d "$1" ]]; then
+    gz_die "$(basename "$1") is a file; gentoozinho needs $1 to be a directory. Move the file into it, e.g. $1/local, and re-run."
+  fi
+}
+
 # gz_write_portage_config NCPU MEM_MB: write every /etc/portage file we own.
 gz_write_portage_config() {
   local ncpu="$1" mem_mb="$2" etc="${GZ_ROOT:-}/etc/portage"
+  local makeopts_line=""
+
+  gz_require_dir "$etc/package.accept_keywords"
+  gz_require_dir "$etc/package.license"
+
+  # Respect a MAKEOPTS the user already tuned in make.conf (file or directory).
+  if ! grep -rqs '^MAKEOPTS=' "$etc/make.conf"; then
+    makeopts_line="MAKEOPTS=\"$(gz_makeopts "$ncpu" "$mem_mb")\""
+  fi
 
   gz_write_file "$etc/package.accept_keywords/gentoozinho" <<'EOF_KW'
 # Managed by gentoozinho. The Hypr stack, GURU and our own overlay are ~amd64 only.
@@ -72,10 +93,11 @@ EOF_LIC
 
   gz_write_file "$etc/gentoozinho.conf" <<EOF_CONF
 # Managed by gentoozinho and sourced from make.conf. Put local overrides in
-# make.conf after the source line.
+# make.conf after the source line. MAKEOPTS is only set here when make.conf
+# does not define it.
 FEATURES="\${FEATURES} getbinpkg binpkg-request-signature"
 EMERGE_DEFAULT_OPTS="\${EMERGE_DEFAULT_OPTS} --binpkg-respect-use=y --jobs=2 --load-average=${ncpu}"
-MAKEOPTS="$(gz_makeopts "$ncpu" "$mem_mb")"
+${makeopts_line}
 ACCEPT_LICENSE="\${ACCEPT_LICENSE} @FREE"
 EOF_CONF
 

@@ -135,7 +135,10 @@ Things profiles cannot or should not carry are written by the installer into
 `/etc/portage/` (all named `gentoozinho` so they are easy to find and remove):
 
 - `package.accept_keywords/gentoozinho`: `*/*::hyproverlay ~amd64`,
-  `*/*::gentoozinho ~amd64`, plus the specific GURU packages we use.
+  `*/*::gentoozinho ~amd64`, `*/*::guru ~amd64` (whole repo: GURU is
+  testing-only by policy and Portage still prefers `::gentoo` unless GURU has
+  a higher version, a shadowing risk accepted for now), plus the few
+  `::gentoo` packages that are still `~amd64` (uwsm, sdbus-c++, zoxide).
 - `package.license/gentoozinho`: licenses needed by the apps meta (fonts,
   chromium codecs, and so on), never `*`.
 - `binrepos.conf/gentoozinho.conf`: the official binhost for the matching

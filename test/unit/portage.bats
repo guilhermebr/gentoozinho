@@ -16,6 +16,29 @@ fingerprint() { (cd "$GZ_ROOT" && find etc -type f | sort | xargs md5sum); }
   [ "$(gz_profile_family ../../var/db/repos/gentoo/profiles/default/linux/amd64/23.0/systemd)" = desktop ]
 }
 
+@test "gz_profile_family recognises our own profiles after the first run (review C1)" {
+  [ "$(gz_profile_family ../../var/db/repos/gentoozinho/profiles/vm)" = vm ]
+  [ "$(gz_profile_family ../../var/db/repos/gentoozinho/profiles/desktop)" = desktop ]
+}
+
+@test "gz_write_portage_config dies clearly when package.accept_keywords is a file (review I2)" {
+  mkdir -p "$ETC"
+  printf 'sys-apps/foo ~amd64\n' > "$ETC/package.accept_keywords"
+  run gz_write_portage_config 4 8192
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"package.accept_keywords is a file"* ]]
+}
+
+@test "gz_write_portage_config leaves an existing MAKEOPTS alone (review I3)" {
+  mkdir -p "$ETC"
+  printf 'MAKEOPTS="-j16"\n' > "$ETC/make.conf"
+  gz_write_portage_config 4 8192 > /dev/null
+  run ! grep -q '^MAKEOPTS=' "$ETC/gentoozinho.conf"
+  rm "$ETC/make.conf" "$ETC/gentoozinho.conf"
+  gz_write_portage_config 4 8192 > /dev/null
+  grep -q '^MAKEOPTS="-j4 -l4"' "$ETC/gentoozinho.conf"
+}
+
 @test "gz_current_profile reads the make.profile symlink" {
   mkdir -p "$ETC"
   ln -s ../../var/db/repos/gentoo/profiles/default/linux/amd64/23.0/no-multilib/systemd "$ETC/make.profile"
