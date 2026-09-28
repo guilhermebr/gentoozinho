@@ -33,3 +33,15 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
     [ "$atoms" = "$(printf '%s\n' "$atoms" | sort -u)" ]
   done
 }
+
+@test "apps ships firefox-bin, never chromium (last-rited in ::gentoo on 2026-09-24)" {
+  grep -q 'www-client/firefox-bin' "$REPO/gentoozinho-meta/apps/apps-0.ebuild"
+  ! grep -rq 'www-client/chromium' "$REPO/gentoozinho-meta"
+}
+
+@test "DESCRIPTION fits pkgcheck's 80 character limit" {
+  for f in "$REPO"/gentoozinho-meta/*/*.ebuild; do
+    d="$(sed -n 's/^DESCRIPTION="\([^"]*\)"/\1/p' "$f")"
+    [ "${#d}" -le 80 ]
+  done
+}

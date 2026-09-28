@@ -10,10 +10,12 @@ LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~amd64"
 
+# Chromium itself was masked for removal from ::gentoo on 2026-09-24
+# (bug #982204); the remaining chromium-based browsers are all proprietary.
 RDEPEND="
 	app-office/libreoffice-bin
 	app-text/evince
 	media-gfx/imv
 	media-video/mpv
-	www-client/chromium
+	www-client/firefox-bin
 "

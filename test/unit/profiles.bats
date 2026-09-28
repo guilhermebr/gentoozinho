@@ -26,12 +26,21 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 }
 
 @test "base sets the shared USE defaults" {
-  grep -q '^USE=".*wayland' "$REPO/profiles/base/make.defaults"
-  grep -q '^USE=".*pipewire' "$REPO/profiles/base/make.defaults"
+  grep -q '^USE=".*networkmanager' "$REPO/profiles/base/make.defaults"
   grep -q '^USE=".*dist-kernel' "$REPO/profiles/base/make.defaults"
+  # pipewire is a local flag (not in use.desc) and targets/desktop sets it anyway
+  ! grep -q '^USE=".*pipewire' "$REPO/profiles/base/make.defaults"
 }
 
 @test "base pins hyprland to systemd and uwsm" {
   grep -qE '^gui-wm/hyprland .*systemd' "$REPO/profiles/base/package.use"
   grep -qE '^gui-wm/hyprland .*uwsm' "$REPO/profiles/base/package.use"
+}
+
+@test "base works around the cxxopts ebuild that uses icu without depending on it" {
+  grep -qE '^dev-libs/cxxopts -icu' "$REPO/profiles/base/package.use"
+}
+
+@test "base builds the distribution kernel without debug info" {
+  grep -qE '^sys-kernel/gentoo-kernel -debug' "$REPO/profiles/base/package.use"
 }

@@ -1,6 +1,7 @@
 # Shared USE defaults for every gentoozinho profile. Both vm and desktop
-# already inherit gentoo's targets/desktop (X, dbus, opengl, gtk, qt6, ...),
-# so only what that target lacks goes here. Per-package flags live in
+# already inherit gentoo's targets/desktop (X, dbus, opengl, wayland, pipewire,
+# vulkan, bluetooth, gtk, qt6, ...), so only what that target lacks goes here,
+# and only flags declared global in use.desc. Per-package flags live in
 # package.use; anything a profile cannot carry is written to /etc/portage by
 # install.sh.
-USE="wayland pipewire vulkan bluetooth networkmanager dist-kernel"
+USE="networkmanager dist-kernel"

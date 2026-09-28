@@ -44,7 +44,7 @@ step "dev and apps metas resolve"
 vm 'sudo emerge --pretend --quiet gentoozinho-meta/dev gentoozinho-meta/apps'
 
 step "pkgcheck on the overlay"
-vm 'sudo emerge --noreplace --quiet dev-util/pkgcheck && pkgcheck scan -r gentoozinho'
+vm 'sudo emerge --noreplace --quiet dev-util/pkgcheck && pkgcheck scan -r gentoozinho -p stable --keywords=-UnknownCategoryDirs --exit=error,warning'
 
 echo
 echo "SMOKE OK"

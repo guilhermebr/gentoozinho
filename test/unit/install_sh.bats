@@ -38,3 +38,20 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 @test "finish step never reboots without a tty" {
   grep -q '\[\[ -t 0 \]\]' "$REPO/install/finish/10-summary.sh"
 }
+
+@test "repos step declares the main gentoo repo in repos.conf (pkgcore and pkgcheck need it)" {
+  f="$REPO/install/portage/30-repos.sh"
+  grep -q '/usr/share/portage/config/repos.conf' "$f"
+  grep -q 'repos.conf/gentoo.conf' "$f"
+}
+
+@test "smoke test scans stable profiles only and tolerates our non-category dirs" {
+  grep -q 'pkgcheck scan -r gentoozinho -p stable --keywords=-UnknownCategoryDirs' "$REPO/test/vm-smoke.sh"
+}
+
+@test "repos step syncs the master overlays before registering gentoozinho" {
+  f="$REPO/install/portage/30-repos.sh"
+  sync_line="$(grep -n 'emaint sync -r "\$repo"' "$f" | cut -d: -f1)"
+  add_line="$(grep -n 'eselect repository add gentoozinho' "$f" | cut -d: -f1)"
+  [ -n "$sync_line" ] && [ -n "$add_line" ] && [ "$sync_line" -lt "$add_line" ]
+}

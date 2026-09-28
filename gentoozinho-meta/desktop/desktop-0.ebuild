@@ -3,7 +3,7 @@
 
 EAPI=8
 
-DESCRIPTION="gentoozinho desktop: Hyprland session, bar, launcher, portals, audio, network, fonts"
+DESCRIPTION="gentoozinho desktop: Hyprland session, bar, launcher, portals, audio, fonts"
 HOMEPAGE="https://github.com/guilhermebr/gentoozinho"
 
 LICENSE="metapackage"

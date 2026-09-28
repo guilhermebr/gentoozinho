@@ -7,7 +7,7 @@ setup() {
 }
 
 @test "layout.conf declares the repo and formats" {
-  grep -qx 'masters = gentoo' "$REPO/metadata/layout.conf"
+  grep -qx 'masters = gentoo guru hyproverlay' "$REPO/metadata/layout.conf"
   grep -qx 'repo-name = gentoozinho' "$REPO/metadata/layout.conf"
   grep -qx 'thin-manifests = true' "$REPO/metadata/layout.conf"
   grep -qx 'profile-formats = portage-2' "$REPO/metadata/layout.conf"

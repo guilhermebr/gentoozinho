@@ -5,3 +5,10 @@ gui-wm/hyprland systemd uwsm -hyprpm
 media-video/pipewire sound-server
 # Portals on Wayland.
 sys-apps/xdg-desktop-portal-gtk wayland
+# dev-libs/cxxopts-3.3.1 has IUSE=icu but no dependency on dev-libs/icu, so it
+# fails to configure when icu is enabled globally (targets/desktop does that).
+# Unicode help text in an option parser is not worth the bug; turn it off.
+dev-libs/cxxopts -icu
+# The distribution kernel's debug info is useless on a desktop and makes the
+# build tree about 10 GB, which overflowed a 20 GB VM disk.
+sys-kernel/gentoo-kernel -debug
