@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Print the installed gentoozinho revision (git-r3 records it at merge time).
+set -euo pipefail
+GENTOOZINHO_PATH="${GENTOOZINHO_PATH:-/usr/share/gentoozinho}"
+if [[ -f /var/db/pkg/app-misc/gentoozinho-9999/EGIT_VERSION ]]; then
+  cat /var/db/pkg/app-misc/gentoozinho-9999/EGIT_VERSION
+elif git -C "$GENTOOZINHO_PATH" rev-parse --short HEAD 2>/dev/null; then
+  :
+else
+  echo dev
+fi

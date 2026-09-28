@@ -12,6 +12,7 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	app-misc/brightnessctl
+	app-misc/gentoozinho
 	gentoozinho-meta/base
 	gnome-base/nautilus
 	gui-apps/grim
