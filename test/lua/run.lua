@@ -115,6 +115,25 @@ test("core bindings are present", function()
   assert(by_keys["XF86AudioRaiseVolume"].opts.locked and by_keys["XF86AudioRaiseVolume"].opts.repeating, "media bind opts")
 end)
 
+test("gz.bind rejects Omarchy-only dispatcher tables with a clear message (review I2)", function()
+  fresh_hl()
+  load_user_config()
+  for _, form in ipairs({ { webapp = "https://x.com" }, { tui = "btop" }, { menu = "system" } }) do
+    local ok, err = pcall(gz.bind, "SUPER + F10", "Snippet", form)
+    assert(not ok and tostring(err):find("Omarchy%-only"), "no clear error for Omarchy form")
+  end
+end)
+
+test("terminal tag covers foot's reverse-DNS app-id so universal copy stays safe (review I3)", function()
+  local hl = fresh_hl()
+  load_user_config()
+  local found = false
+  for _, r in ipairs(hl._window_rules) do
+    if r.tag == "+terminal" and r.match and r.match.class and r.match.class:find("codeberg") then found = true end
+  end
+  assert(found, "terminal tag rule does not cover org.codeberg.dnkl.foot")
+end)
+
 -- ---- run --------------------------------------------------------------------
 for _, t in ipairs(tests) do
   local ok, err = pcall(t.fn)

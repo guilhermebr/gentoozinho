@@ -15,9 +15,19 @@ function gz.require_optional(module)
   end
 end
 
-local function to_dispatcher(dispatcher)
-  if type(dispatcher) == "table" and dispatcher.launch then
-    return hl.dsp.exec_cmd(gz.launch(dispatcher.launch))
+-- Omarchy's o.bind accepts more table forms than gentoozinho ships handlers for.
+local omarchy_only = { "omarchy", "menu", "panel", "webapp", "tui", "audio", "brightness", "ipc", "focus" }
+
+local function to_dispatcher(keys, dispatcher)
+  if type(dispatcher) == "table" and dispatcher._dsp == nil then
+    if dispatcher.launch then
+      return hl.dsp.exec_cmd(gz.launch(dispatcher.launch))
+    end
+    for _, key in ipairs(omarchy_only) do
+      if dispatcher[key] ~= nil then
+        error(("gz.bind %q: Omarchy-only dispatcher { %s = ... }; use a command string or { launch = cmd }"):format(keys, key), 3)
+      end
+    end
   elseif type(dispatcher) == "string" then
     return hl.dsp.exec_cmd(dispatcher)
   end
@@ -30,7 +40,7 @@ function gz.bind(keys, description, dispatcher, opts)
   local o_ = {}
   for k, v in pairs(opts or {}) do o_[k] = v end
   if description then o_.description = description end
-  return hl.bind(keys, to_dispatcher(dispatcher), o_)
+  return hl.bind(keys, to_dispatcher(keys, dispatcher), o_)
 end
 
 function gz.rebind(keys, description, dispatcher, opts)

@@ -122,3 +122,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
   grep -q 'sddm-greeter-qt6' "$REPO/test/vm-smoke.sh"
   grep -q 'greeter.png' "$REPO/test/vm-smoke.sh"
 }
+
+@test "user stage re-renders the theme fragment for upgraded homes (review I1)" {
+  grep -q 'current/theme/hyprland.lua' "$REPO/install/user/30-theme.sh"
+}

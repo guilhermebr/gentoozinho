@@ -75,6 +75,9 @@ we did with it, what broke.
   prepends `uwsm-app --`, `gz.window(match, rules)` builds the rule table.
 - Clipboard shortcuts use `send_key_state` with a 50 ms down/up split (from
   Omarchy v4) rather than `send_shortcut`, which can leave synthetic keys stuck.
+  Super+C sends Ctrl+Shift+C in windows tagged `terminal` and Ctrl+C
+  elsewhere, so a terminal that is not tagged gets an interrupt instead of a
+  copy: new terminals must be added to `default/hypr/apps/terminals.lua`.
 - Because Hyprland keeps loading `hyprland.conf` when it exists,
   `gentoozinho-refresh-config --init` moves a hyprlang home to
   `~/.config/hypr/pre-lua/` before seeding Lua; the installer's user stage

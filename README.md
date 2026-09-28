@@ -24,7 +24,9 @@ work taught: `docs/learning/`.
 Hyprland is configured in Lua (Hyprland 0.57 drops the old `.conf` format):
 your files are `~/.config/hypr/*.lua`, `gz.bind(keys, description, command)`
 adds a binding, `gz.rebind` replaces one, and the full API is described in
-`/usr/share/hypr/stubs/hl.meta.lua`. A phase 2 install is migrated on the next
+`/usr/share/hypr/stubs/hl.meta.lua`. `o` is an alias of `gz`, so Omarchy
+snippets that use command strings, `hl.dsp` dispatchers or `{ launch = }`
+paste in unchanged; Omarchy's menu, webapp and tui forms are not available. A phase 2 install is migrated on the next
 installer run (old files land in `~/.config/hypr/pre-lua/`).
 
 Known: real hardware (`desktop` profile) is still untested (phase 3). A 20 GB disk is tight for a VM that compiles; give it
