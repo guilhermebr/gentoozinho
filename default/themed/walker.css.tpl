@@ -5,3 +5,4 @@
 @define-color border {{ foreground }};
 @define-color foreground {{ foreground }};
 @define-color background {{ background }};
+@define-color color1 {{ accent }};

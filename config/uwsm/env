@@ -1,0 +1,4 @@
+# Environment for the gentoozinho session (read by uwsm before Hyprland starts).
+export TERMINAL=alacritty
+export EDITOR=nvim
+export PATH="$PATH:$HOME/.local/bin"

@@ -1,0 +1,2 @@
+# Theme colours come from the active gentoozinho theme; shared defaults from core.ini.
+include=~/.config/gentoozinho/current/theme/mako.ini

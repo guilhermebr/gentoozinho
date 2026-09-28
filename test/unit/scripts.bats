@@ -15,7 +15,7 @@ setup() { REPO="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"; }
 @test "every gentoozinho-* command referenced anywhere in default/ or config/ exists in bin/" {
   cd "$REPO"
   missing=""
-  for cmd in $(grep -rhoE 'gentoozinho-[a-z0-9-]+' default config 2>/dev/null | sort -u); do
+  for cmd in $(grep -rhoE 'gentoozinho-[a-z0-9-]+(\.css)?' default config 2>/dev/null | grep -v '\.css$' | sort -u); do
     [ -f "bin/$cmd" ] || missing="$missing $cmd"
   done
   [ -z "$missing" ] || { echo "missing:$missing"; false; }

@@ -22,6 +22,7 @@ teardown() { rm -rf "$HOME"; }
   grep -q '@define-color background #1a1b26;' "$t/waybar.css"
   grep -q 'rgba(26,27,38, 1.0)' "$t/hyprlock.conf"
   grep -q '@define-color selected-text #7aa2f7;' "$t/walker.css"
+  grep -q '@define-color color1 #7aa2f7;' "$t/walker.css"
   grep -q '@define-color progress #7aa2f7;' "$t/swayosd.css"
   grep -q 'background = "#1a1b26"' "$t/alacritty.toml"
   [ "$(cat "$HOME/.config/gentoozinho/current/theme.name")" = tokyo-night ]

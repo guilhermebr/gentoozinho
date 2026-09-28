@@ -1,0 +1,8 @@
+# shellcheck shell=bash
+# Sourced from ~/.bashrc by the gentoozinho installer. Keep it light.
+export PATH="$PATH:$HOME/.local/bin"
+alias ls='eza -lh --group-directories-first --icons=auto'
+alias cat='bat --paging=never --style=plain'
+alias ff='fastfetch'
+command -v starship > /dev/null && eval "$(starship init bash)"
+command -v zoxide > /dev/null && eval "$(zoxide init bash)"
